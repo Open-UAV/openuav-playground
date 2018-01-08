@@ -5,6 +5,7 @@ import time
 import subprocess
 
 SIM_CONTAINER_PORT = '31819'
+PROJECT_PREFIX = 'openuavapp_'
 
 def index(request):
 	return HttpResponse("Hey!! What are you up to?")
@@ -14,9 +15,9 @@ def index(request):
 ####################################################################
 ####################################################################
 
-# docker run -it --net=openuavproject_default --name=openauv2 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhijeet/Documents/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=$DISPLAY --entrypoint "/simulation/run_this.sh" openuavproject_openuav
+# docker run -it --net=openuavapp_default --name=openauv2 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhijeet/Documents/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=$DISPLAY --entrypoint "/simulation/run_this.sh" openuavproject_openuav
 
-# nvidia-docker run -it --net=openuavproject_default --name=openuavproject_openauv3 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhsingh/Laptop/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=$DISPLAY --entrypoint "/simulation/run_this.sh" openuavproject_openuav
+# nvidia-docker run -it --net=openuavapp_default --name=openuavapp_openauv3 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhsingh/Laptop/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=$DISPLAY --entrypoint "/simulation/run_this.sh" openuavproject_openuav
 
 def hostnameToIP(hostname):
 	cmd = ''' nslookup hostname | sed -n '6p' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'  '''
@@ -42,7 +43,7 @@ def console(request):
 	measuresUp = 0
 
 	try:
-		simulation_hostname = 'openuavproject_' + request.GET.get('user','openuav_1')
+		simulation_hostname = PROJECT_PREFIX + request.GET.get('user','openuav_1')
 		# simulation_hostname = 'openuavproject_openuav_1'
 		simulation_ip = hostnameToIP(simulation_hostname)
 		# simulation_ip = '172.28.0.3'
@@ -69,7 +70,7 @@ def console(request):
 
 def adminconsole(request):
 	try:
-		simulation_hostname = 'openuavproject_' + request.GET.get('user','openuav_1')
+		simulation_hostname = PROJECT_PREFIX + request.GET.get('user','openuav_1')
 		# simulation_hostname = 'openuavproject_openuav_1'
 		simulation_ip = hostnameToIP(simulation_hostname)
 		# simulation_ip = '172.19.0.3'

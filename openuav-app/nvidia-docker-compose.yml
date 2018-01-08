@@ -16,22 +16,6 @@ services:
     - /dev/nvidia-uvm-tools
     volumes:
     - nvidia_driver_384.90:/usr/local/nvidia:ro
-  nginx:
-    build: dockerfiles/nginx/
-    depends_on:
-    - web
-    devices:
-    - /dev/nvidia0
-    - /dev/nvidia1
-    - /dev/nvidiactl
-    - /dev/nvidia-uvm
-    - /dev/nvidia-uvm-tools
-    ports:
-    - 8001:80
-    restart: always
-    volumes:
-    - ./dockerfiles/nginx/config:/etc/nginx/conf.d
-    - nvidia_driver_384.90:/usr/local/nvidia:ro
   openuav:
     build: dockerfiles/openuav_sample/
     devices:
@@ -55,7 +39,7 @@ services:
   web:
     build: dockerfiles/django/
     command: bash -c "python manage.py makemigrations && python manage.py migrate
-      && python3 manage.py runserver 0.0.0.0:8000"
+      && python3 manage.py runserver 0.0.0.0:80"
     depends_on:
     - db
     devices:
@@ -64,8 +48,8 @@ services:
     - /dev/nvidiactl
     - /dev/nvidia-uvm
     - /dev/nvidia-uvm-tools
-    expose:
-    - '8000'
+    ports:
+    - 8001:80
     restart: always
     volumes:
     - .:/code

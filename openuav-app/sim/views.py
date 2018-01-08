@@ -17,7 +17,7 @@ def index(request):
 
 # docker run -it --net=openuavapp_default --name=openauv2 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhijeet/Documents/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=$DISPLAY --entrypoint "/simulation/run_this.sh" openuavproject_openuav
 
-# nvidia-docker run -it --net=openuavapp_default --name=openuavapp_openauv3 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhsingh/Laptop/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=$DISPLAY --entrypoint "/simulation/run_this.sh" openuavproject_openuav
+# nvidia-docker run -it --net=openuavapp_default --name=openuavapp_openauv3 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/abhsingh/Laptop/openuav/samples/leader-follower/simulation:/simulation -e DISPLAY=:0 --entrypoint "/simulation/run_this.sh" openuavproject_openuav
 
 def hostnameToIP(hostname):
 	cmd = ''' nslookup hostname | sed -n '6p' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'  '''
@@ -32,10 +32,10 @@ def hostnameToIP(hostname):
 	return output.decode('UTF-8').strip()
 
 def ipToViewNum(ip):
-	# 172.28.0.6 corresponds to view-1.openuav.us - we return the number '1' here
+	# 172.28.0.5 corresponds to view-1.openuav.us - we return the number '1' here
 	lastOctetStr = ip.split('.')[-1]
 	lastOctetInt = int(lastOctetStr)
-	return str(lastOctetInt - 5)
+	return str(lastOctetInt - 4)
 
 
 def console(request):
@@ -47,8 +47,8 @@ def console(request):
 		# simulation_hostname = 'openuavproject_openuav_1'
 		simulation_ip = hostnameToIP(simulation_hostname)
 		# simulation_ip = '172.28.0.3'
-		simulation_viewDomainName = 'view-' + ipToViewNum(simulation_ip) + '.openuav.us:8001'
-		simulation_rosDomainName = 'ros-' + ipToViewNum(simulation_ip) + '.openuav.us:8001'
+		simulation_viewDomainName = 'view-' + ipToViewNum(simulation_ip) + '.openuav.us'
+		simulation_rosDomainName = 'ros-' + ipToViewNum(simulation_ip) + '.openuav.us'
 	except Exception as e:	
 		return HttpResponse(render(request, 'sim/error.html', {'error' : '400 Bad Request'}))
 
@@ -68,7 +68,7 @@ def console(request):
 	except Exception as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : '500 Internal Server Error. Contact the admin.'}))
 
-def adminconsole(request):
+def unsecure_console(request):
 	try:
 		simulation_hostname = PROJECT_PREFIX + request.GET.get('user','openuav_1')
 		# simulation_hostname = 'openuavproject_openuav_1'
@@ -90,6 +90,6 @@ def adminconsole(request):
 			time.sleep(1)
 
 		# num_uavs = 2
-		return HttpResponse(render(request, 'sim/dev_console.html', {'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_unsecure.html', {'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
 	except Exception as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : str(e)}))

@@ -6,23 +6,14 @@ services:
   web:
     restart: always
     build: dockerfiles/django/
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
-    # command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn openuav.wsgi -b 0.0.0.0:8000"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:80"
+    # command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn openuav.wsgi -b 0.0.0.0:80"
     volumes:
       - .:/code
-    expose:
-      - "8000"
-    depends_on:
-      - db
-  nginx:
-    restart: always
-    build: dockerfiles/nginx/
     ports:
       - "8001:80"
-    volumes:
-      - ./dockerfiles/nginx/config:/etc/nginx/conf.d
     depends_on:
-      - web
+      - db
   openuav:
     build: dockerfiles/openuav_sample/
     volumes:

@@ -18,7 +18,7 @@
         // Connecting to ROS
         // -----------------
         isConnected = false;
-        websocket_url_str = 'wss://{{rosDomainName}}';
+        websocket_url_str = 'ws://{{rosDomainName}}';
         ros = new ROSLIB.Ros({
             url: websocket_url_str
         });
@@ -142,10 +142,10 @@
                                 <tr style="width:100%;height: auto;">
                                     <div class="container-fluid">
                                         <td style="width:50%;height: auto;">
-                                            <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_2_camera/image_raw_front/ground_truth_tracking" height="600" width="800" frameborder="0"></iframe>
+                                            <iframe id="video-object-detections" src="http://{{viewDomainName}}/stream_viewer?topic=/uav_2_camera/image_raw_front/ground_truth_tracking" height="600" width="800" frameborder="0"></iframe>
                                         </td>
                                         <td style="width:50%;height: auto;">
-                                            <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/general_contours/image" height="600" width="800" frameborder="0"></iframe>
+                                            <iframe id="video-object-detections" src="http://{{viewDomainName}}/stream_viewer?topic=/general_contours/image" height="600" width="800" frameborder="0"></iframe>
                                         </td>
                                     </div>
                                 </tr>
@@ -153,10 +153,10 @@
                                 <tr style="width:100%;height: auto;">
                                     <div class="container-fluid">
                                         <td style="width:50%;height: auto;">
-                                            <iframe id="video-1{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_front&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
+                                            <iframe id="video-1{{forloop.counter}}" src="http://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_front&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
                                         </td>
                                         <td style="width:50%;height: auto;">
-                                            <iframe id="video-2{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_down&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
+                                            <iframe id="video-2{{forloop.counter}}" src="http://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_down&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
                                         </td>
                                     </div>
                                 </tr>

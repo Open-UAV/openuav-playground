@@ -4,6 +4,6 @@ from . import views
 
 urlpatterns = [
 	path('console/', views.console, name='console'),
-	path('adminconsole', views.adminconsole, name='adminconsole'),
+	path('unsecure_console/', views.unsecure_console, name='unsecure_console'),
     	path('', views.index, name='index'),
 ]

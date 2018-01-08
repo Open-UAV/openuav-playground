@@ -4,7 +4,6 @@ source /root/.profile
 source /simulation/inputs/parameters/swarm.sh
 source /opt/ros/kinetic/setup.bash
 source ~/catkin_ws/devel/setup.bash
-cp /simulation/inputs/world/cityterrain.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
 cp /simulation/inputs/setup/posix_sitl_multibase.launch /root/src/Firmware/launch/
 cp /simulation/inputs/setup/swarm.sh /root/src/Firmware/Tools/
 rm /simulation/outputs/*.csv

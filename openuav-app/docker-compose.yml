@@ -1,0 +1,46 @@
+version: '2'
+
+services:
+  db:
+    build: dockerfiles/postgres/
+  web:
+    restart: always
+    build: dockerfiles/django/
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    # command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn openuav.wsgi -b 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    expose:
+      - "8000"
+    depends_on:
+      - db
+  nginx:
+    restart: always
+    build: dockerfiles/nginx/
+    ports:
+      - "8001:80"
+    volumes:
+      - ./dockerfiles/nginx/config:/etc/nginx/conf.d
+    depends_on:
+      - web
+  openuav:
+    build: dockerfiles/openuav_sample/
+    volumes:
+      - /home/abhsingh/Laptop/openuav/samples/leader-follower/simulation:/simulation
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=$DISPLAY
+    expose:
+      - "8000"
+      - "31819"
+      - "80"
+      - "9090"
+    entrypoint: /simulation/run_this.sh
+
+networks:  
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1

@@ -1,0 +1,62 @@
+<launch>
+
+    <!-- Posix SITL environment launch script -->
+    <arg name="z" default="0"/>
+    <arg name="R" default="0"/>
+    <arg name="P" default="0"/>
+    <arg name="Y" default="0"/>
+
+
+
+    <arg name="x1" default="0"/>
+    <arg name="y1" default="1"/>
+
+
+    <arg name="est" default="lpe"/>
+    <arg name="vehicle1" default="f450-tmp-1"/>
+    <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/empty.world"/>
+    <arg name="sdf1" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle1)/$(arg vehicle1).sdf"/>
+    <arg name="rcS1" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle1)"/>
+
+    <arg name="headless" default="true"/>
+    <arg name="gui" default="false"/>
+    <arg name="ns" default="/"/>
+
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+    <arg name="paused" default="false"/>
+
+    <arg name="log_output" default="screen" />
+
+    <arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+    <arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+
+    <node name="sitl1" pkg="px4" type="px4" output="screen"
+        args="$(find px4) $(arg rcS1)">
+    </node>
+
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="headless" value="$(arg headless)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="world_name" value="$(arg world)" />
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="verbose" value="$(arg verbose)" />
+        <arg name="paused" value="$(arg paused)" />
+    </include>
+
+    <node name="$(anon vehicle_spawn_1)" output="screen" pkg="gazebo_ros" type="spawn_model"
+        args="-sdf -file $(arg sdf1) -model $(arg vehicle1) -x $(arg x1) -y $(arg y1) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>-->
+
+
+    <node pkg="mavros" type="mavros_node" name="mavros1" required="true" clear_params="true" output="$(arg log_output)">
+		<param name="fcu_url" value="udp://:14140@localhost:14157"/>
+		<param name="gcs_url" value="" />
+		<param name="target_system_id" value="1" />
+		<param name="target_component_id" value="1" />
+		<param name="system_id" value="10" />
+		<rosparam command="load" file="$(arg pluginlists_yaml)" />
+		<rosparam command="load" file="$(arg config_yaml)" />
+		<param name="local_position/tf/child_frame_id" value="uav1" />
+    </node>
+</launch>

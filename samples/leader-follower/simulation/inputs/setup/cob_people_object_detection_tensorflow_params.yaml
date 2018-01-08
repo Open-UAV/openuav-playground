@@ -1,0 +1,6 @@
+model_name: "ssd_mobilenet_v1_coco_11_06_2017"
+num_of_classes: 200
+label_file: "mscoco_label_map.pbtxt"
+camera_namespace: "/uav_2_camera/image_raw_front"
+
+

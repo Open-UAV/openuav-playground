@@ -16,7 +16,7 @@ python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
 sleep 15
 python /simulation/inputs/setup/testArmAll.py $num_uavs &> /dev/null &
 sleep 1
-python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE 1 1 0 &> /dev/null &
+python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE $ALTITUDE 1 0 &> /dev/null &
 
 
 for((i=1;i<$num_uavs;i+=1))

@@ -9,15 +9,8 @@ rm -f /root/src/Firmware/posix-configs/SITL/init/lpe/f450-tmp-*
 rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 ## Previous clean-up
 
-#world setup
-#cp /simulation/inputs/world/cityterrain.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
 
 rm -f /simulation/outputs/*.csv
-LOOP_EDGE=20
-
-#Xvfb :1 -screen 0 1600x1200x16  &
-#export DISPLAY=:1.0
-
 echo "Setup..."
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
 sleep 15

@@ -8,7 +8,7 @@ from mavros_msgs.msg import State
 from geometry_msgs.msg import PoseStamped, Point, Quaternion, TwistStamped
 import math
 import sys
-import tf
+
 
 
 class TestFollow:
@@ -17,6 +17,7 @@ class TestFollow:
     leader_pose = PoseStamped()
     leader_vel = TwistStamped()
    
+
     isReadyToFly = False
     #alpha = .7#const scale of leader velocity
 
@@ -30,22 +31,15 @@ class TestFollow:
         rospy.Subscriber('/mavros'+ this_uav + '/state', State, callback=self.state_cb)
 	rospy.Subscriber('/mavros'+ leader_uav + '/local_position/velocity', TwistStamped, callback=self.leaderVel_cb)
 
-        rate = rospy.Rate(20)  # Hz
+        rate = rospy.Rate(100)  # Hz
         rate.sleep()
         self.des_pose = self.copy_pose(self.curr_pose)
         while not rospy.is_shutdown():
             if self.isReadyToFly:
                 self.des_pose.pose.position.x = self.leader_pose.pose.position.x + (self.leader_vel.twist.linear.x*D_GAIN)
                 self.des_pose.pose.position.y = self.leader_pose.pose.position.y + (self.leader_vel.twist.linear.y*D_GAIN)
-                self.des_pose.pose.position.z = self.leader_pose.pose.position.z + 4
-
-		azimuth = math.atan2(self.leader_pose.pose.position.y-self.curr_pose.pose.position.y, self.leader_pose.pose.position.x-self.curr_pose.pose.position.x)
-                quaternion = tf.transformations.quaternion_from_euler(0, 0, azimuth)
-                self.des_pose.pose.orientation.x = quaternion[0]
-                self.des_pose.pose.orientation.y = quaternion[1]
-                self.des_pose.pose.orientation.z = quaternion[2]
-                self.des_pose.pose.orientation.w = quaternion[3]
-
+                self.des_pose.pose.position.z = H
+                self.des_pose.pose.orientation = self.leader_pose.pose.orientation
 
             pose_pub.publish(self.des_pose)
             rate.sleep()

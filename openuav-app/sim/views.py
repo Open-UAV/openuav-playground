@@ -50,7 +50,7 @@ def console(request):
 		simulation_viewDomainName = 'view-' + ipToViewNum(simulation_ip) + '.openuav.us'
 		simulation_rosDomainName = 'ros-' + ipToViewNum(simulation_ip) + '.openuav.us'
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : '400 Bad Request'}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : '400 Bad Request' + str(e)}))
 
 	try:
 		while num_uav_str=='':
@@ -66,7 +66,7 @@ def console(request):
 		# num_uavs = 2
 		return HttpResponse(render(request, 'sim/dev_console.html', {'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
 	except Exception as e:
-		return HttpResponse(render(request, 'sim/error.html', {'error' : '500 Internal Server Error. Contact the admin.'}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : '500 Internal Server Error. Contact the admin.' + str(e)}))
 
 def unsecure_console(request):
 	try:

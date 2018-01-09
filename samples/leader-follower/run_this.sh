@@ -12,12 +12,6 @@ rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 #world setup
 #cp /simulation/inputs/world/cityterrain.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
 
-#Django start server
-python3 /django/manage.py makemigrations &> /dev/null
-python3 /django/manage.py migrate &> /dev/null
-python3 /django/manage.py runserver 0.0.0.0:31819 &> /dev/null &
-#Django start server
-
 rm -f /simulation/outputs/*.csv
 LOOP_EDGE=20
 

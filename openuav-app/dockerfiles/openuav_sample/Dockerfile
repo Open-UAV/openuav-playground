@@ -149,6 +149,12 @@ COPY django_files/query_view.py /django/query/views.py
 RUN sed -i '/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['\''*'\'']' /django/DjangoProject/settings.py
 ### Django set up to expose various states from the simulation container
 
+#Django start server
+RUN echo "python3 /django/manage.py makemigrations &> /dev/null" >> ~/.profile
+RUN echo "python3 /django/manage.py migrate &> /dev/null" >> ~/.profile
+RUN echo "python3 /django/manage.py runserver 0.0.0.0:31819 &> /dev/null &" >> ~/.profile
+#Django start server
+
 WORKDIR /root
 
 RUN ["/bin/bash"]

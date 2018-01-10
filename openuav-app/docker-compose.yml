@@ -26,7 +26,7 @@ services:
       - "31819"
       - "80"
       - "9090"
-    entrypoint: /simulation/run_this.sh
+    entrypoint: /home/setup.sh
 
 networks:  
   default:

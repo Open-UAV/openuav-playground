@@ -1,4 +1,5 @@
 #!/bin/bash
+
 source /simulation/inputs/parameters/swarm.sh
 source /opt/ros/kinetic/setup.bash
 source ~/catkin_ws/devel/setup.bash

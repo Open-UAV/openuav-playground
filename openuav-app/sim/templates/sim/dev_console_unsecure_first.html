@@ -46,7 +46,7 @@
             $('#spinner').show();
             $.ajax({
                 type: "POST",
-                url: "/sim/unsecure_console2/",                
+                url: "/sim/unsecure_console2/?user={{userid}}",                
                 success: function(data){             
                     $('#ajax-populate').html(data);
                     $('#spinner').hide();

@@ -101,7 +101,8 @@ def console1(request):
 	measuresUp = 0
 
 	try:
-		simulation_hostname = PROJECT_PREFIX + request.GET.get('user','openuav_1')
+		simulation_hostname_without_prefix = request.GET.get('user','openuav_1')
+		simulation_hostname = PROJECT_PREFIX + simulation_hostname_without_prefix
 		simulation_ip = hostnameToIP(simulation_hostname)
 		simulation_viewDomainName = 'view-' + ipToViewNum(simulation_ip) + '.openuav.us'
 		simulation_rosDomainName = 'ros-' + ipToViewNum(simulation_ip) + '.openuav.us'
@@ -114,7 +115,7 @@ def console1(request):
 			num_uav_str=str(results.decode('UTF-8').split('#')[0])
 			time.sleep(1)
 		num_uavs = int(num_uav_str)
-		return HttpResponse(render(request, 'sim/dev_console_first.html', {'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_first.html', {'userid': simulation_hostname_without_prefix, 'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
 	except Exception as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : '500 Internal Server Error. Contact the admin.' + str(e)}))
 
@@ -152,8 +153,8 @@ def console2(request):
 @csrf_exempt
 def unsecure_console1(request):
 	try:
-		simulation_hostname = PROJECT_PREFIX + request.GET.get('user','openuav_1')
-		# simulation_hostname = 'openuavproject_openuav_1'
+		simulation_hostname_without_prefix = request.GET.get('user','openuav_1')
+		simulation_hostname = PROJECT_PREFIX + simulation_hostname_without_prefix
 		simulation_ip = hostnameToIP(simulation_hostname)
 		# simulation_ip = '172.19.0.3'
 		simulation_viewDomainName = simulation_ip+ ':80'
@@ -166,7 +167,7 @@ def unsecure_console1(request):
 			num_uav_str=str(results.decode('UTF-8').split('#')[0])
 			time.sleep(1)
 		num_uavs = int(num_uav_str)
-		return HttpResponse(render(request, 'sim/dev_console_unsecure_first.html', {'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_unsecure_first.html', {'userid': simulation_hostname_without_prefix, 'range' : range(int(num_uavs)), 'num_uavs' : num_uavs, 'viewDomainName' : simulation_viewDomainName, 'rosDomainName' : simulation_rosDomainName}))
 	except Exception as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : str(e)}))
 

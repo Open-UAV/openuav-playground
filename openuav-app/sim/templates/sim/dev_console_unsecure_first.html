@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+
+    <script type="text/javascript" src="https://openuav.us/scripts/eventemitter2.js"></script>
+    <script type="text/javascript" src="https://openuav.us/scripts/roslib.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+    <title>UAV Simulation</title>
+</head>
+
+<body id="page-body" style="background-color:#DADFEA;">
+
+
+    <!-- Navigation bar -->
+    <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
+    <nav class="navbar navbar-light" style="background-color: #10378D;">
+      <a class="navbar-brand" href="#" style="color:#DADFEA;" >OpenUAV Web Console</a>
+    </nav>
+    <!-- Navigation bar -->
+
+    <div class="container-fluid table-responsive" id="ajax-populate">
+    </div>
+
+    <div id="spinner" style="position: absolute;left:50%;top:50%;">
+        {% load static %}
+        <img src="{% static "sim/loading.gif" %}" alt="Loading..">
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+    <script>
+        $( document ).ready(function() {
+            console.log( "ready!" );
+            $('#spinner').show();
+            $.ajax({
+                type: "POST",
+                url: "/sim/unsecure_console2/",                
+                success: function(data){             
+                    $('#ajax-populate').html(data);
+                    $('#spinner').hide();
+                },
+                error: function (response) {
+                    $('#spinner').hide();
+                }           
+            });
+        });
+    </script>
+</body>
+
+</html>

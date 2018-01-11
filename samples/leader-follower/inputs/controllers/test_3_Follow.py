@@ -8,6 +8,7 @@ from mavros_msgs.msg import State
 from geometry_msgs.msg import PoseStamped, Point, Quaternion, TwistStamped
 import math
 import sys
+import tf
 
 
 
@@ -39,7 +40,14 @@ class TestFollow:
                 self.des_pose.pose.position.x = self.leader_pose.pose.position.x + (self.leader_vel.twist.linear.x*D_GAIN)
                 self.des_pose.pose.position.y = self.leader_pose.pose.position.y + (self.leader_vel.twist.linear.y*D_GAIN)
 		self.des_pose.pose.position.z = self.leader_pose.pose.position.z + 1
-                self.des_pose.pose.orientation = self.leader_pose.pose.orientation
+
+		azimuth = math.atan2(self.leader_pose.pose.position.y-self.curr_pose.pose.position.y, self.leader_pose.pose.position.x-self.curr_pose.pose.position.x)
+                quaternion = tf.transformations.quaternion_from_euler(0, 0, azimuth)
+                self.des_pose.pose.orientation.x = quaternion[0]
+                self.des_pose.pose.orientation.y = quaternion[1]
+                self.des_pose.pose.orientation.z = quaternion[2]
+                self.des_pose.pose.orientation.w = quaternion[3]
+
 
             pose_pub.publish(self.des_pose)
             rate.sleep()

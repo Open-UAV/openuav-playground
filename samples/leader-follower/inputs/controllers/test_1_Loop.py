@@ -53,6 +53,16 @@ class TestLoop:
                 self.des_pose.pose.position.x = des_x
                 self.des_pose.pose.position.y = des_y
                 self.des_pose.pose.position.z = des_z
+
+                self.des_pose.pose.orientation.x = self.locations[self.waypointIndex, 3]
+                self.des_pose.pose.orientation.y = self.locations[self.waypointIndex, 4]
+                self.des_pose.pose.orientation.z = self.locations[self.waypointIndex, 5]
+                self.des_pose.pose.orientation.w = self.locations[self.waypointIndex, 6]
+
+                curr_x = self.curr_pose.pose.position.x
+                curr_y = self.curr_pose.pose.position.y
+                curr_z = self.curr_pose.pose.position.z
+
                 azimuth = math.atan2(0-curr_y, 20-curr_x)
                 quaternion = tf.transformations.quaternion_from_euler(0, 0, azimuth)
                 print quaternion
@@ -61,9 +71,7 @@ class TestLoop:
                 self.des_pose.pose.orientation.z = quaternion[2]
                 self.des_pose.pose.orientation.w = quaternion[3]
 
-                curr_x = self.curr_pose.pose.position.x
-                curr_y = self.curr_pose.pose.position.y
-                curr_z = self.curr_pose.pose.position.z
+
 
                 dist = math.sqrt((curr_x - des_x)*(curr_x - des_x) + (curr_y - des_y)*(curr_y - des_y) + (curr_z - des_z)*(curr_z - des_z))
                 if dist < self.distThreshold:

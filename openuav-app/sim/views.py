@@ -80,7 +80,7 @@ def isSimReady(simulation_ip):
 			measuresUp=int(str(results.decode('UTF-8').split('#')[0]))
 			if measuresUp < 2:
 				time.sleep(1)
-		time.sleep(3)
+		time.sleep(1)
 		return True
 	except Exception as e:
 		raise ContainerInformationFetchExc(str(e))

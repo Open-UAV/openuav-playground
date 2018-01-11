@@ -45,6 +45,6 @@ do
     /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /measure > /simulation/outputs/measure.csv &
 
 
-    sleep $duration_seconds
+    sleep 360000
     cat /simulation/outputs/measure.csv | awk -F',' '{sum+=$2; ++n} END { print sum/n }' > /simulation/outputs/average_measure.txt
 

@@ -52,6 +52,7 @@
                     $('#spinner').hide();
                 },
                 error: function (response) {
+                    $('#ajax-populate').html('<a>There is some error with the simulation or network.</a>');
                     $('#spinner').hide();
                 }           
             });

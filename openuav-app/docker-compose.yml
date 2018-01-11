@@ -17,7 +17,7 @@ services:
   openuav:
     build: dockerfiles/openuav_sample/
     volumes:
-      - ../samples/leader-follower:/simulation
+      - ../samples/testSimulation:/simulation
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
       - DISPLAY=$DISPLAY

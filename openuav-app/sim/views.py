@@ -50,7 +50,7 @@ def ipToViewNum(ip):
 
 def getUserIDWithoutDefault(request):
 	try:
-		userid = request.GET.get('user')
+		userid = request.GET['user']
 		return userid
 	except Exception as e:
 		raise NoUserIDExc(str(e))

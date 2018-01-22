@@ -147,9 +147,23 @@ COPY django_files/project_urls.py /django/DjangoProject/urls.py
 COPY django_files/query_urls.py /django/query/urls.py
 COPY django_files/query_view.py /django/query/views.py
 RUN sed -i '/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['\''*'\'']' /django/DjangoProject/settings.py
+### Django set up to expose various states from the simulation container
+
+# Wetty - web tty
+RUN mkdir /wetty
+RUN cd /wetty && git clone https://github.com/krishnasrinivas/wetty && \
+    cd wetty && npm install
+
+# Adding user term and giving permissions
+RUN useradd -d /simulation -m -s /bin/bash term
+RUN echo 'term:term' | chpasswd
+RUN chmod -R 777 /root/src
+RUN chmod -R 777 /simulation
+RUN chmod -R 777 /opt/ros
+
+# Ensure the setup.sh is in the last, so that we can build again quickly if setup changes
 ADD setup.sh /home/
 RUN chmod +x /home/setup.sh
-### Django set up to expose various states from the simulation container
 
 WORKDIR /root
 

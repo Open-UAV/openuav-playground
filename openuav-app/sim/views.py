@@ -197,7 +197,7 @@ def unsecure_console1(request):
 		simNodeIP = hostnameToIP(simNodeHostname)
 		viewDomainName, rosDomainName = getUnsecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console_unsecure_first.html', {'userid': userid, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_unsecure_first.html', {'terminalDomainName': simNodeIP + ':3000','userid': userid, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:

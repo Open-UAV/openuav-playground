@@ -9,10 +9,6 @@ rm -rf /root/src/Firmware/Tools/sitl_gazebo/models/f450-tmp-*
 rm -f /root/src/Firmware/posix-configs/SITL/init/lpe/f450-tmp-*
 rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 
-# world setup #
-cp /simulation/inputs/world/empty.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
-cp /simulation/inputs/models/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/models/f450-1/f450-1.sdf
-
 rm -f /simulation/outputs/*.csv
 echo "Setup..."
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
@@ -45,6 +41,6 @@ do
     /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /measure > /simulation/outputs/measure.csv &
 
 
-    sleep 360000
+    sleep 3600000
     cat /simulation/outputs/measure.csv | awk -F',' '{sum+=$2; ++n} END { print sum/n }' > /simulation/outputs/average_measure.txt
 

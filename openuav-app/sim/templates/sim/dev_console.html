@@ -105,76 +105,130 @@
     <title>UAV Simulation</title>
 </head>
 
-<body id="page-body" onLoad="pageOnload()" style="background-color:#DADFEA;">
+<body id="page-body" style="background-color:#FFFFFF;">
 
 
     <!-- Navigation bar -->
     <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
-    <nav class="navbar navbar-light" style="background-color: #10378D;">
-      <a class="navbar-brand" href="#" style="color:#DADFEA;" >OpenUAV Web Console</a>
+    <nav class="navbar navbar-light" style="background-color: #000000;">
+        <div class="container-fluid">
+            <table style="width: 100%">
+                <tr>
+                    <td class="block">
+                        <a class="navbar-brand" href="#" style="color:#808080;" >OpenUAV Web Console</a>
+                    </td>
+                    <td align="right" style="float:right">
+                        <ul class="nav nav-pills" style="text-align: right;">
+                            <li class="nav-item active"><a class="nav-link" id="clickForHome" data-toggle="pill" href="#home">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#menu1">Terminal</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </nav>
     <!-- Navigation bar -->
 
-    <div class="container-fluid table-responsive">
-        <table class="table">
-            <tr style="width:100%;height: auto;">
-                <td style="width:40%;height: auto;">
-                    <div class="container-fluid">
-                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:300px;">
-                            {% for _ in range %}
-                            <polygon id="/traingle-{{forloop.counter}}" points="25,6 10,40 40,40" style="fill:lime;stroke:purple;stroke-width:1" />
-                            <circle id="/mavros{{forloop.counter}}/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="grey" /> 
-                            {% endfor %}
-                        </svg>
-
-                        <div id="measure">nan</div>
-                        <br/> 
-                        {% for _ in range %}
-                        <div id="debug{{forloop.counter}}">nan</div>
-                        <br/> 
-                        {% endfor %}
-                    </div>
-                </td>
-                <td style="width:60%;height: auto;">
-                    <div class="container-fluid table-responsive">
-                        <table class="table">
+    <!-- Main Content -->
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <div class="container-fluid table-responsive">
+                <table class="table">
+                    <tr style="width:100%;height: auto;">
+                        <td style="width:40%;height: auto;">
                             <div class="container-fluid">
-                                <tr style="width:100%;height: auto;">
-                                    <div class="container-fluid">
-                                        <td style="width:50%;height: auto;">
-                                            <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_2_camera/image_raw_front/ground_truth_tracking" height="600" width="800" frameborder="0"></iframe>
-                                        </td>
-                                        <td style="width:50%;height: auto;">
-                                            <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/general_contours/image" height="600" width="800" frameborder="0"></iframe>
-                                        </td>
-                                    </div>
-                                </tr>
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:300px;">
+                                    {% for _ in range %}
+                                    <polygon id="/traingle-{{forloop.counter}}" points="25,6 10,40 40,40" style="fill:lime;stroke:purple;stroke-width:1" />
+                                    <circle id="/mavros{{forloop.counter}}/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="grey" /> 
+                                    {% endfor %}
+                                </svg>
+
+                                <div id="measure">nan</div>
+                                <br/> 
                                 {% for _ in range %}
-                                <tr style="width:100%;height: auto;">
-                                    <div class="container-fluid">
-                                        <td style="width:50%;height: auto;">
-                                            <iframe id="video-1{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_front&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
-                                        </td>
-                                        <td style="width:50%;height: auto;">
-                                            <iframe id="video-2{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_down&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
-                                        </td>
-                                    </div>
-                                </tr>
+                                <div id="debug{{forloop.counter}}">nan</div>
+                                <br/> 
                                 {% endfor %}
                             </div>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        </table>
+                        </td>
+                        <td style="width:60%;height: auto;">
+                            <div class="container-fluid table-responsive">
+                                <table class="table">
+                                    <div class="container-fluid">
+                                        <tr style="width:100%;height: auto;">
+                                            <div class="container-fluid">
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_2_camera/image_raw_front/ground_truth_tracking" height="600" width="800" frameborder="0"></iframe>
+                                                </td>
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/general_contours/image" height="600" width="800" frameborder="0"></iframe>
+                                                </td>
+                                            </div>
+                                        </tr>
+                                        {% for _ in range %}
+                                        <tr style="width:100%;height: auto;">
+                                            <div class="container-fluid">
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-1{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_front&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
+                                                </td>
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-2{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_down&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
+                                                </td>
+                                            </div>
+                                        </tr>
+                                        {% endfor %}
+                                    </div>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="menu1" class="tab-pane fade">
+            <iframe id="ifm" src="https://{{terminalDomainName}}" style="position:relative; left: 0; right: 0; bottom: 0; top: 0px;" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
     </div>
+    <!-- Main Content -->
 
-
-    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+    <script>
+        $( document ).ready(function() {
+            $('#clickForHome').click();
+        });
+    </script>
+
+    <!-- For setting iframe height -->
+    <script type="text/javascript">
+        var buffer = 65; //scroll bar buffer
+        var iframe = document.getElementById('ifm');
+
+        function pageY(elem) {
+            return elem.offsetParent ? (elem.offsetTop + pageY(elem.offsetParent)) : elem.offsetTop;
+        }
+
+        function resizeIframe() {
+            var height = document.documentElement.clientHeight;
+            height -= pageY(document.getElementById('ifm'))+ buffer ;
+            height = (height < 0) ? 0 : height;
+            document.getElementById('ifm').style.height = height + 'px';
+            console.log(height + 'px');
+        }
+
+        // .onload doesn't work with IE8 and older.
+        if (iframe.attachEvent) {
+            iframe.attachEvent("onload", resizeIframe);
+        } else {
+            iframe.onload=resizeIframe;
+        }
+
+        window.onresize = resizeIframe;
+    </script>
 </body>
 
 </html>

@@ -52,7 +52,7 @@
             </div>
         </div>
         <div id="menu1" class="tab-pane fade">
-            <iframe src="http://{{terminalDomainName}}" style="display:block;width:100%;" height="700px" frameborder="0"></iframe>
+            <iframe id="ifm" src="http://{{terminalDomainName}}" style="position:relative; left: 0; right: 0; bottom: 0; top: 0px;" width="100%" height="100%" frameborder="0"></iframe>
         </div>
     </div>
     <!-- Main Content -->
@@ -79,6 +79,33 @@
                 }           
             });
         });
+    </script>
+
+    <!-- For setting iframe height -->
+    <script type="text/javascript">
+        var buffer = 65; //scroll bar buffer
+        var iframe = document.getElementById('ifm');
+
+        function pageY(elem) {
+            return elem.offsetParent ? (elem.offsetTop + pageY(elem.offsetParent)) : elem.offsetTop;
+        }
+
+        function resizeIframe() {
+            var height = document.documentElement.clientHeight;
+            height -= pageY(document.getElementById('ifm'))+ buffer ;
+            height = (height < 0) ? 0 : height;
+            document.getElementById('ifm').style.height = height + 'px';
+            console.log(height + 'px');
+        }
+
+        // .onload doesn't work with IE8 and older.
+        if (iframe.attachEvent) {
+            iframe.attachEvent("onload", resizeIframe);
+        } else {
+            iframe.onload=resizeIframe;
+        }
+
+        window.onresize = resizeIframe;
     </script>
 </body>
 

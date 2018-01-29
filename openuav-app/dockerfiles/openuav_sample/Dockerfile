@@ -160,6 +160,7 @@ RUN echo 'term:term' | chpasswd
 RUN chmod -R 777 /root/src
 RUN chmod -R 777 /simulation
 RUN chmod -R 777 /opt/ros
+RUN find /root -type d -exec chmod 755 {} \;
 
 # Ensure the setup.sh is in the last, so that we can build again quickly if setup changes
 ADD setup.sh /home/

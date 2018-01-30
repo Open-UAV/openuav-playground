@@ -151,6 +151,7 @@ RUN sed -i '/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['\''*'\'']' /django/DjangoProject/
 
 # Wetty - web tty
 RUN mkdir /wetty
+RUN npm explore npm -g -- npm install node-gyp@latest
 RUN cd /wetty && git clone https://github.com/krishnasrinivas/wetty && \
     cd wetty && npm install
 

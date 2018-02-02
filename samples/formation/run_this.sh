@@ -23,14 +23,14 @@ sleep 15
 #python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE $ALTITUDE 1 0 &> /dev/null &
 #python /simulation/inputs/controllers/simple_Patrol.py 0 $num_uavs 1 &> /simulation/outputs/patrolLog.txt & 
 
-echo "FLAG"
+echo "Launch UAVs"
 
 for((i = 0;i<$num_uavs;i+=1))
 do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
     sleep 6
 done
-
+echo "Launch Sequencer"
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt & 
 
 

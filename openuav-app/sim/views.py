@@ -96,12 +96,14 @@ def getErrorBasedOnLevel(str, e):
 def getSecureDomainNames(simNodeIP):
 	vdn = 'view-' + ipToViewNum(simNodeIP) + '.openuav.us'
 	rdn = 'ros-' + ipToViewNum(simNodeIP) + '.openuav.us'
-	return vdn, rdn
+	tdn = 'term-' + ipToViewNum(simNodeIP) + '.openuav.us'
+	return vdn, rdn, tdn
 
 def getUnsecureDomainNames(simNodeIP):
 	vdn = simNodeIP + ':80'
 	rdn = simNodeIP + ':9090'
-	return vdn, rdn
+	tdn = simNodeIP + ':3000'
+	return vdn, rdn, tdn
 
 ########################################################
 ########################################################
@@ -114,10 +116,10 @@ def console(request):
 		userid = getUserIDWithoutDefault(request)
 		simNodeHostname = PROJECT_PREFIX + userid
 		simNodeIP = hostnameToIP(simNodeHostname)
-		viewDomainName, rosDomainName = getSecureDomainNames(simNodeIP)
+		viewDomainName, rosDomainName, terminalDomainName = getSecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
 		isSimReady(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console.html', {'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console.html', {'terminalDomainName': terminalDomainName, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:
@@ -135,10 +137,10 @@ def unsecure_console(request):
 		userid = getUserIDWithDefault(request)
 		simNodeHostname = PROJECT_PREFIX + userid
 		simNodeIP = hostnameToIP(simNodeHostname)
-		viewDomainName, rosDomainName = getUnsecureDomainNames(simNodeIP)
+		viewDomainName, rosDomainName, terminalDomainName = getUnsecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
 		isSimReady(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console_unsecure.html', {'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_unsecure.html', {'terminalDomainName': terminalDomainName, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:
@@ -155,9 +157,9 @@ def console1(request):
 		userid = getUserIDWithoutDefault(request)
 		simNodeHostname = PROJECT_PREFIX + userid
 		simNodeIP = hostnameToIP(simNodeHostname)
-		viewDomainName, rosDomainName = getSecureDomainNames(simNodeIP)
+		viewDomainName, rosDomainName, terminalDomainName = getSecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console_first.html', {'userid': userid, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_first.html', {'terminalDomainName': terminalDomainName, 'userid': userid, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:
@@ -175,10 +177,10 @@ def console2(request):
 		userid = getUserIDWithoutDefault(request)
 		simNodeHostname = PROJECT_PREFIX + userid
 		simNodeIP = hostnameToIP(simNodeHostname)
-		viewDomainName, rosDomainName = getSecureDomainNames(simNodeIP)
+		viewDomainName, rosDomainName, terminalDomainName = getSecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
 		isSimReady(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console_second.html', {'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_second.html', {'terminalDomainName': terminalDomainName, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:
@@ -195,9 +197,9 @@ def unsecure_console1(request):
 		userid = getUserIDWithDefault(request)
 		simNodeHostname = PROJECT_PREFIX + userid
 		simNodeIP = hostnameToIP(simNodeHostname)
-		viewDomainName, rosDomainName = getUnsecureDomainNames(simNodeIP)
+		viewDomainName, rosDomainName, terminalDomainName = getUnsecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console_unsecure_first.html', {'userid': userid, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_unsecure_first.html', {'terminalDomainName': terminalDomainName, 'userid': userid, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:
@@ -215,10 +217,10 @@ def unsecure_console2(request):
 		userid = getUserIDWithDefault(request)
 		simNodeHostname = PROJECT_PREFIX + userid
 		simNodeIP = hostnameToIP(simNodeHostname)
-		viewDomainName, rosDomainName = getUnsecureDomainNames(simNodeIP)
+		viewDomainName, rosDomainName, terminalDomainName = getUnsecureDomainNames(simNodeIP)
 		numUAVs = getNumUAVs(simNodeIP)
 		isSimReady(simNodeIP)
-		return HttpResponse(render(request, 'sim/dev_console_unsecure_second.html', {'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
+		return HttpResponse(render(request, 'sim/dev_console_unsecure_second.html', {'terminalDomainName': terminalDomainName, 'range' : range(int(numUAVs)), 'num_uavs' : numUAVs, 'viewDomainName' : viewDomainName, 'rosDomainName' : rosDomainName}))
 	except NoContainerExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Container not present.', str(e))}))
 	except ContainerInformationFetchExc as e:

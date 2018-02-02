@@ -16,7 +16,6 @@ from std_srvs.srv import Empty
 
 
 class TestSequence:
-	
     command = Float64MultiArray()
     command.layout = MultiArrayLayout()
     command.layout.dim = [MultiArrayDimension()]
@@ -25,7 +24,7 @@ class TestSequence:
 
     def __init__(self, NUM_UAV):
 
-	global status
+        global status
 
 	self.command.layout.dim[0].label = 'command'
 	self.command.layout.dim[0].size = 4
@@ -44,29 +43,31 @@ class TestSequence:
 		exec('def status_cb'+str(i)+'(msg): status['+str(i)+'] = msg')
 		rospy.Subscriber('/sequencer/status'+str(i), Int8, callback = eval('status_cb'+str(i)))
 
+        # subscribing to each uav's status
+        for i in range(NUM_UAV):
+            exec ('def status_cb' + str(i) + '(msg): status[' + str(i) + '] = msg')
+            rospy.Subscriber('/sequencer/status' + str(i), Int8, callback=eval('status_cb' + str(i)))
 
         rospy.init_node('sequencer_test', anonymous=True)
- 	
-	print "INIT\n"	
-	
-        pub = rospy.Publisher('/sequencer/command', Float64MultiArray, queue_size = 10)
-	rospy.Subscriber('/sequencer/status', Float64MultiArray, callback = self.status_cb)
-	
+
+        print "INIT\n"
+
+        pub = rospy.Publisher('/sequencer/command', Float64MultiArray, queue_size=10)
+        rospy.Subscriber('/sequencer/status', Float64MultiArray, callback=self.status_cb)
+
         rate = rospy.Rate(10)  # Hz
         rate.sleep()
 
-	#wait to all drones to connect to the sequencer
-	nc = pub.get_num_connections()
-	while nc < NUM_UAV:
-		nc = pub.get_num_connections()
-		rate.sleep()	
+        # wait to all drones to connect to the sequencer
+        nc = pub.get_num_connections()
+        while nc < NUM_UAV:
+            nc = pub.get_num_connections()
+            rate.sleep()
 
-	
-	print 'num_connections = '+ str(nc) 
-	print 'publishing - \n'+ str(self.command)
-	pub.publish(self.command)
-	sys.stdout.flush()
-	
+        print 'num_connections = ' + str(nc)
+        print 'publishing - \n' + str(self.command)
+        pub.publish(self.command)
+        sys.stdout.flush()
 
         while not rospy.is_shutdown():
 		publish = True

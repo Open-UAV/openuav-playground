@@ -17,7 +17,7 @@ rm -f /simulation/outputs/*.csv
 rm -f /simulation/outputs/*.txt
 echo "Setup..."
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
-sleep 15
+sleep 20
 #python /simulation/inputs/setup/testArmAll.py $num_uavs &> /simulation/outputs/armlog.txt &
 #sleep 1
 #python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE $ALTITUDE 1 0 &> /dev/null &

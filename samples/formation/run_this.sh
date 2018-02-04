@@ -18,10 +18,6 @@ rm -f /simulation/outputs/*.txt
 echo "Setup..."
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
 sleep 20
-#python /simulation/inputs/setup/testArmAll.py $num_uavs &> /simulation/outputs/armlog.txt &
-#sleep 1
-#python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE $ALTITUDE 1 0 &> /dev/null &
-#python /simulation/inputs/controllers/simple_Patrol.py 0 $num_uavs 1 &> /simulation/outputs/patrolLog.txt & 
 
 echo "Launch UAVs"
 
@@ -34,18 +30,13 @@ echo "Launch Sequencer"
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt & 
 
 
-
-
 roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
-
-echo "Measures..."
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &
-
-
 rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
 roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &
 
+echo "Measures..."
 for((i=1;i<=$num_uavs;i+=1))
 do
         /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /mavros$i/local_position/odom > /simulation/outputs/uav$i.csv &

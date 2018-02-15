@@ -27,6 +27,8 @@ from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Vect
 # Notes
 #	-random drones not initializing, cant consistently recreate issue 
 #	-commands get to velocity control and scramble
+#	-need to completely swap to global 
+#	-is there a heartbeat like dronekit?
  
 class TestFormation: 
 		
@@ -49,7 +51,7 @@ class TestFormation:
 	global cur_globalPose	
 
 	cur_pose = [PoseStamped() for i in range(NUM_UAV)]
-	cur_globalPose = [NavSatFix() for i in range(NUM_UAV)]
+	cur_globalPose = [Odometry() for i in range(NUM_UAV)]
     	cur_state = [State() for i in range(NUM_UAV)]
     	cur_vel =  [TwistStamped() for i in range(NUM_UAV)]
   
@@ -68,20 +70,17 @@ class TestFormation:
 	
 
 	print('paramPull - \n' + str(paramPull_proxy(True)))
-
-	#print('rospy_getParam-COM_ARM_EFK_AB\n'+ str(rospy.get_param('/mavros'+str(this_uav+1)+'/param/COM_ARM_EFK_AB')))
-
+	#print('rospy_getParam-COM_ARM_AUTH\n'+ str(rospy.get_param('/mavros'+str(this_uav+1)+'/param/COM_ARM_AUTH')))
 	print('paramGet MAV_TYPE - \n' + str(paramGet_proxy("MAV_TYPE")))
 	print('______________________________________________________________________________')
-	
-	#generating subscribers to ALL drones in the swarm
+	#generating subscribers to each drone
 	for i in range(NUM_UAV):
     		exec('def position_cb'+ str(i) +'(msg): cur_pose['+ str(i) +'] = msg')	
 		exec('def globalPosition_cb'+str(i)+'(msg): cur_globalPose['+ str(i) +'] = msg')
 		exec('def velocity_cb'+ str(i) +'(msg): cur_vel['+ str(i) +'] = msg')
 		exec('def state_cb'+ str(i) +'(msg): cur_state['+ str(i) +'] = msg')
 		rospy.Subscriber('/mavros'+ str(i + 1) + '/local_position/pose', PoseStamped, callback= eval('position_cb'+ str(i)))
-		rospy.Subscriber('/mavros'+ str(i + 1) + '/global_position/global', NavSatFix, callback= eval('globalPosition_cb'+str(i)))
+		rospy.Subscriber('/mavros'+ str(i + 1) + '/global_position/local', TwistStamped, callback= eval('globalPosition_cb'+str(i)))
         	rospy.Subscriber('/mavros'+ str(i + 1) + '/state', State, callback= eval('state_cb'+str(i)))
 		rospy.Subscriber('/mavros'+ str(i + 1) + '/local_position/velocity', TwistStamped, callback=eval('velocity_cb'+ str(i)))
 
@@ -89,18 +88,11 @@ class TestFormation:
 	rospy.Subscriber('/sequencer/command', Float64MultiArray, callback = self.command_cb)
         #publish status to sequencer
 	status_pub = rospy.Publisher('/sequencer/status'+str(this_uav), Int8, queue_size = 10)
-	#publish position setpoints to FCU
+	#publish position to mav
 	pose_pub = rospy.Publisher('/mavros'+ str(this_uav + 1) + '/setpoint_position/local', PoseStamped, queue_size = 10)
-	#publish velocity setpoints to FCU
+	#publish velocity to mav
 	vel_pub = rospy.Publisher('/mavros'+str(this_uav + 1) + '/setpoint_velocity/cmd_vel', TwistStamped, queue_size = 10)
-	#2nd subscriber to uav-state [temporary]
-	rospy.Subscriber('/mavros' + str(this_uav + 1) + '/state', State, callback = self.state_cb)
-
-	#assigning identities for drone ahead and behind in formation
-	#only relevant to rotations in cmd 4
-	plus_uav = (this_uav + 1) % NUM_UAV
-	minus_uav = (this_uav - 1) % NUM_UAV
-	
+ 
 	#GOTO initial holding pattern command = [0,0,25,0]
 	des_pose = cur_pose[this_uav]
 	des_pose.pose.position.x = 10 * math.sin((this_uav * 2 * math.pi) / NUM_UAV)
@@ -110,23 +102,7 @@ class TestFormation:
 	status_pub.publish(self.status)
 
 	#....fix....double subscribe to status, check and set status in callback?
-        print cur_state[this_uav]
-	print '---------------arming-----------------------'
-	
-	t = time.clock()
-	while True:
-		pose_pub.publish(des_pose)
-		if cur_state[this_uav].system_status == 4:
-			print cur_state[this_uav]
-			break
-		elif time.clock() - t > 30:
-			print 'TIMEOUT'
-			break
-	
-	print 'INITIAL POSITION'
-	print cur_globalPose[this_uav]
-
-	while cur_state[this_uav].mode != 'OFFBOARD' and not cur_state[this_uav].armed:
+        while cur_state[this_uav].mode != 'OFFBOARD' and not cur_state[this_uav].armed:
 		mode_sent = False
 		success = False
 		pose_pub.publish(des_pose)		
@@ -149,7 +125,8 @@ class TestFormation:
 	print 'arm_sent - ' + str(success)
 	print 'armed?'
 	rate.sleep()
-	print cur_state[this_uav]
+	print cur_state[this_uav].armed
+	print cur_state[this_uav].mode
 
 	#wait for sequencer to connect to /sequencer/status# 
 	nc = status_pub.get_num_connections()
@@ -181,31 +158,9 @@ class TestFormation:
 	    	des_pose.pose.position.z = 25
 		pose_pub.publish(des_pose)
 	    if self.command.data[3] > 3:
-		r = math.sqrt(math.pow(cur_pose[this_uav].pose.position.x,2) + math.pow(cur_pose[this_uav].pose.position.y,2))
-		theta = math.atan2(cur_pose[this_uav].pose.position.y, cur_pose[this_uav].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
-		theta_plus = math.atan2(cur_pose[plus_uav].pose.position.y, cur_pose[plus_uav].pose.position.x) % (2*math.pi)
-		theta_minus = math.atan2(cur_pose[minus_uav].pose.position.y, cur_pose[minus_uav].pose.position.x) % (2*math.pi) 
-		
-		#deal with wrap around
-		if math.fabs(theta_plus - theta_minus) > math.pi:
-			theta_des = ((theta_plus + theta_minus)/2 + math.pi)%(2*math.pi)	
-		else:
-			theta_des = ((theta_plus + theta_minus)/2)%(2*math.pi) 
-
-		if math.fabs(theta_des - theta) > math.pi:
-			thetaDot = math.copysign(((2*math.pi) - math.fabs(theta_des - theta))/2, (theta_des - theta))
-		else:
-			thetaDot = (theta_des - theta) #gains, make variables
-
-		thetaDot =  thetaDot*.5 + .5 
-		rDot = (self.command.data[2] - r) * 2
-	
-		des_vel.twist.linear.x = rDot*math.cos(theta) - r*thetaDot*math.sin(theta)
-		des_vel.twist.linear.y = rDot*math.sin(theta) + r*thetaDot*math.cos(theta)
-
-		#des_vel.twist.linear.x = (self.command.data[2] * math.sin((this_uav * 2 * math.pi)/NUM_UAV) - cur_pose[this_uav].pose.position.x) * .5
-		#des_vel.twist.linear.y = (self.command.data[2] * math.cos((this_uav * 2 * math.pi)/NUM_UAV) - cur_pose[this_uav].pose.position.y) * .5
-		des_vel.twist.linear.z = (25 - cur_pose[this_uav].pose.position.z) * .5 
+		des_vel.twist.linear.x = (this_uav - cur_globalPose[this_uav].pose.pose.position.x) 
+		des_vel.twist.linear.y = (this_uav - cur_globalPose[this_uav].pose.pose.position.y)
+		des_vel.twist.linear.z = 0
 		vel_pub.publish(des_vel)
 	    rate.sleep()
 		#azimuth = math.atan2(self.leader_pose.pose.position.y-self.curr_pose.pose.position.y, self.leader_pose.pose.position.x-self.curr_pose.pose.position.x)
@@ -233,6 +188,7 @@ class TestFormation:
 	print 'COMMAND CALLBACK TIME  - '+ str(time.clock())
 	sys.stdout.flush()
 	
+
 
 
 	

@@ -85,9 +85,9 @@ class TestSequence:
 	                  
     def nextCommand(self):
 	if self.iterator == 4:                #flip to velocity control
-		temp = [0,0,20,self.iterator]
+		temp = [0,0,30,self.iterator]
 	elif self.iterator == 3:
-		temp = [0,0,20,self.iterator]
+		temp = [0,0,30,self.iterator]
 	elif self.iterator == 2:
 		temp = [0,0,40,self.iterator]
 	elif self.iterator == 1:

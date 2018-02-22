@@ -4,6 +4,10 @@ source /simulation/inputs/parameters/swarm.sh
 source /opt/ros/kinetic/setup.bash
 source ~/catkin_ws/devel/setup.bash
 
+
+apt-get update
+apt-get install -y ros-kinetic-geodesy
+
 ## Previous clean-up
 rm -rf /root/src/Firmware/Tools/sitl_gazebo/models/f450-tmp-*
 rm -f /root/src/Firmware/posix-configs/SITL/init/lpe/f450-tmp-*

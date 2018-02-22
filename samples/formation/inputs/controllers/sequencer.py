@@ -38,15 +38,13 @@ class TestSequence:
 	sum_stat = Int8()
 	sum_stat.data = 0
 	
-	#subscribing to each uav's status
-	for i in range(NUM_UAV):
-		exec('def status_cb'+str(i)+'(msg): status['+str(i)+'] = msg')
-		rospy.Subscriber('/sequencer/status'+str(i), Int8, callback = eval('status_cb'+str(i)))
-
         # subscribing to each uav's status
         for i in range(NUM_UAV):
-            exec ('def status_cb' + str(i) + '(msg): status[' + str(i) + '] = msg')
-            rospy.Subscriber('/sequencer/status' + str(i), Int8, callback=eval('status_cb' + str(i)))
+            
+	    exec ('def status_cb' + str(i) + '(msg): status[' + str(i) + '] = msg')
+            #exec ('def state_cb' + str(i) + '(msg): state[' + str(i) + '] = msg' )
+	    #rospy.Subscriber('/mavros/state')
+	    rospy.Subscriber('/sequencer/status' + str(i), Int8, callback=eval('status_cb' + str(i)))
 
         rospy.init_node('sequencer_test', anonymous=True)
 

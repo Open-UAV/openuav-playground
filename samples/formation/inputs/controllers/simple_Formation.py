@@ -10,6 +10,7 @@ import sys
 import math
 import tf
 import time
+import geodesy
 
 from std_msgs.msg import Float64, Float64MultiArray, Int8
 from std_srvs.srv import Empty
@@ -114,19 +115,22 @@ class TestFormation:
 	print '---------------arming-----------------------'
 	
 	t = time.clock()
+	print '----WAITING FOR STANDBY STATUS---'
 	while True:
 		pose_pub.publish(des_pose)
-		if cur_state[this_uav].system_status == 4:
+		if cur_state[this_uav].system_status == 3:
 			print cur_state[this_uav]
 			break
-		elif time.clock() - t > 30:
-			print 'TIMEOUT'
-			break
+	#	elif time.clock() - t > 30:
+	#		print 'TIMEOUT'
+	#		break
 	
 	print 'INITIAL POSITION'
 	print cur_globalPose[this_uav]
 
+
 	while cur_state[this_uav].mode != 'OFFBOARD' and not cur_state[this_uav].armed:
+		print 'intial arming'
 		mode_sent = False
 		success = False
 		pose_pub.publish(des_pose)		
@@ -167,7 +171,26 @@ class TestFormation:
 	print 'Loop INIT Time  - ' + str(time.clock())
         while not rospy.is_shutdown():
 
-	    #pose_pub.publish(des_pose)
+		#hopefully temporary hack
+	    while cur_state[this_uav].mode != 'OFFBOARD' and not cur_state[this_uav].armed:
+		    print 'rearming'
+	 	    mode_sent = False
+		    success = False
+		    pose_pub.publish(des_pose)		
+		    while not mode_sent:
+		    	rospy.wait_for_service('mavros'+str(this_uav + 1)+'/set_mode', timeout = None)
+			try:
+				mode_sent =  mode_proxy(1,'OFFBOARD')
+			except rospy.ServiceException as exc:
+				print exc
+		    while not success:
+			rospy.wait_for_service('mavros'+str(this_uav + 1)+'/cmd/arming', timeout = None)
+			try: 	
+				success =  arm_proxy(True)
+			except rospy.ServiceException as exc:
+				print exc
+		#temp end
+
 	    self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
 	    
 	    if self.convergence < .5 and self.status != Int8(self.command.data[3]):
@@ -181,24 +204,52 @@ class TestFormation:
 	    	des_pose.pose.position.z = 25
 		pose_pub.publish(des_pose)
 	    if self.command.data[3] > 3:
+
 		r = math.sqrt(math.pow(cur_pose[this_uav].pose.position.x,2) + math.pow(cur_pose[this_uav].pose.position.y,2))
+
 		theta = math.atan2(cur_pose[this_uav].pose.position.y, cur_pose[this_uav].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
 		theta_plus = math.atan2(cur_pose[plus_uav].pose.position.y, cur_pose[plus_uav].pose.position.x) % (2*math.pi)
 		theta_minus = math.atan2(cur_pose[minus_uav].pose.position.y, cur_pose[minus_uav].pose.position.x) % (2*math.pi) 
+	
+
+
+		
+		#print  math.atan2(cur_pose[0].pose.position.y, cur_pose[0].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
+		#print  math.atan2(cur_pose[1].pose.position.y, cur_pose[1].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
+		#print  math.atan2(cur_pose[2].pose.position.y, cur_pose[2].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
+		#print  math.atan2(cur_pose[3].pose.position.y, cur_pose[3].pose.position.x) % (2*math.pi)
+		#print  math.atan2(cur_pose[4].pose.position.y, cur_pose[4].pose.position.x) % (2*math.pi)
+	
+
 		
 		#deal with wrap around
-		if math.fabs(theta_plus - theta_minus) > math.pi:
-			theta_des = ((theta_plus + theta_minus)/2 + math.pi)%(2*math.pi)	
+		if theta_minus < theta: #yea looks backwards
+			dtheta_minus = (theta_minus + 2*math.pi) - theta
 		else:
-			theta_des = ((theta_plus + theta_minus)/2)%(2*math.pi) 
+			dtheta_minus = theta_minus - theta
+		if theta < theta_plus: #...again...backwards
+			dtheta_plus = (theta + 2*math.pi) - theta_plus
+		else:	
+			dtheta_plus = theta - theta_plus
+		#theta_des = ((theta_plus + theta_minus)/2)  #%(2*math.pi)	#abs pos of theta_des
+		#if abs((theta_des + 2*math.pi) - theta) < abs(theta_des - theta):
+		#	theta_des = (theta_des + 2*math.pi)
+		#elif abs((theta_des + math.pi) - theta) < abs(theta_des - theta):
+		#	theta_des = (theta_des + math.pi)
+		#else:
+		#	theta_des = ((theta_plus + theta_minus)/2)%(2*math.pi) 
 
-		if math.fabs(theta_des - theta) > math.pi:
-			thetaDot = math.copysign(((2*math.pi) - math.fabs(theta_des - theta))/2, (theta_des - theta))
-		else:
-			thetaDot = (theta_des - theta) #gains, make variables
+		#if math.fabs(theta_des - theta) > math.pi:
+		#	thetaDot = math.copysign(((2*math.pi) - math.fabs(theta_des - theta))/2, (theta_des - theta))
+		#	print 'theta = '+ str(theta) + ' theta_minus = '+str(theta_minus)+' theta_plus = '+str(theta_plus)+ ' theta_des = '+ str(theta_des) + ' thetaDot = ' + str(thetaDot) 
+		#else:
+		thetaDot = (dtheta_minus - dtheta_plus) #even more backwards....
+		print 'theta = '+ str(theta) + ' thetaDot = '+ str(thetaDot) + ' dtheta_plus = ' + str(dtheta_plus)+ ' dtheta_minus = ' + str(dtheta_minus)
 
-		thetaDot =  thetaDot*.5 + .5 
-		rDot = (self.command.data[2] - r) * 2
+		
+
+		thetaDot =  thetaDot*5 + .32 
+		rDot = (self.command.data[2] - r) * 10
 	
 		des_vel.twist.linear.x = rDot*math.cos(theta) - r*thetaDot*math.sin(theta)
 		des_vel.twist.linear.y = rDot*math.sin(theta) + r*thetaDot*math.cos(theta)

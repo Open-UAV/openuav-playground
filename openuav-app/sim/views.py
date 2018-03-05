@@ -5,6 +5,7 @@ import time
 import subprocess
 from django.views.decorators.csrf import csrf_exempt
 from sim.exceptions import *
+import traceback
 
 SIM_CONTAINER_PORT = '31819'
 PROJECT_PREFIX = 'openuavapp_'
@@ -141,7 +142,7 @@ def console(request):
 	except InvalidIPExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Invalid IP.', str(e))}))
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e))}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 
 
 def unsecure_console(request):
@@ -162,7 +163,7 @@ def unsecure_console(request):
 	except InvalidIPExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Invalid IP.', str(e))}))
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e))}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 
 def console1(request):
 	try:
@@ -181,7 +182,7 @@ def console1(request):
 	except InvalidIPExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Invalid IP.', str(e))}))
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e))}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 
 @csrf_exempt
 def console2(request):
@@ -202,7 +203,7 @@ def console2(request):
 	except InvalidIPExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Invalid IP.', str(e))}))
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e))}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 
 def unsecure_console1(request):
 	try:
@@ -221,7 +222,7 @@ def unsecure_console1(request):
 	except InvalidIPExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Invalid IP.', str(e))}))
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e))}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 
 @csrf_exempt
 def unsecure_console2(request):
@@ -242,5 +243,5 @@ def unsecure_console2(request):
 	except InvalidIPExc as e:
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Invalid IP.', str(e))}))
 	except Exception as e:	
-		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e))}))
+		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 

@@ -36,7 +36,7 @@ def hostnameToIP(hostname):
 	outputStr = output.decode('UTF-8').strip()
 
 	if outputStr == '':
-		p1 = subprocess.Popen(['docker', 'network', 'inspect', 'openuavapp_default'], stdout=subprocess.PIPE)
+		p1 = subprocess.Popen(['docker', 'network', 'inspect', 'openuavapp_default'], stdout=subprocess.PIPE, shell=True)
 		out = p1.communicate()
 
 		errorString = 'nslookup returns empty ;; \n'
@@ -77,7 +77,7 @@ def getNumUAVs(simulation_ip):
 		num_uavs = int(num_uav_str)
 		return num_uavs
 	except Exception as e:
-		p1 = subprocess.Popen(['docker', 'network', 'inspect', 'openuavapp_default'], stdout=subprocess.PIPE)
+		p1 = subprocess.Popen(['docker', 'network', 'inspect', 'openuavapp_default'], stdout=subprocess.PIPE, shell=True)
 		out = p1.communicate()
 
 		errorString = str(e) + ' ;; \n'

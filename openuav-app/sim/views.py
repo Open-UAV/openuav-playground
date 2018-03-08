@@ -36,7 +36,7 @@ def hostnameToIP(hostname):
 	outputStr = output.decode('UTF-8').strip()
 
 	if outputStr == '':
-		p1 = subprocess.Popen(['nslookup', 'hostname'], stdout=subprocess.PIPE)
+		p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
 		out = p1.communicate()
 
 		errorString = 'nslookup returns empty ;; \n'
@@ -67,32 +67,58 @@ def getUserIDWithDefault(request):
 	return userid
 
 def getNumUAVs(simulation_ip):
-	try:
-		num_uav_str=''
-		while num_uav_str=='':
-			results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/numUavs').read()
-			num_uav_str=str(results.decode('UTF-8').split('#')[0])
-			if num_uav_str=='':
-				time.sleep(1)
-		num_uavs = int(num_uav_str)
-		return num_uavs
-	except Exception as e:
-		errorString = str(e) + ' ;; \n'
-		errorString = errorString + 'IP: ' + simulation_ip + ' ;; \n'
-		raise ContainerInformationFetchExc(errorString)
+	error = 'Nothing'
+	numTry = 3
+	countTry = 0
+
+	while countTry < numTry:
+		try:
+			num_uav_str=''
+			while num_uav_str=='':
+				results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/numUavs').read()
+				num_uav_str=str(results.decode('UTF-8').split('#')[0])
+				if num_uav_str=='':
+					time.sleep(1)
+			num_uavs = int(num_uav_str)
+			return num_uavs
+		except Exception as e:
+			errorString = str(e) + ' ;; \n'
+			errorString = errorString + 'IP: ' + simulation_ip + ' ;; \n'
+			error = errorString
+
+		countTry = countTry + 1
+		time.sleep(0.5)
+
+	if error != 'Nothing':
+		raise ContainerInformationFetchExc(error)
+	else:
+		return -1
 
 def isSimReady(simulation_ip):
-	measuresUp = 0
-	try:
-		while measuresUp < 2:
-			results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/measures').read()
-			measuresUp=int(str(results.decode('UTF-8').split('#')[0]))
-			if measuresUp < 2:
-				time.sleep(1)
-		time.sleep(2)
-		return True
-	except Exception as e:
-		raise ContainerInformationFetchExc(str(e))
+	error = 'Nothing'
+	numTry = 3
+	countTry = 0
+
+	while countTry < numTry:
+		measuresUp = 0
+		try:
+			while measuresUp < 2:
+				results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/measures').read()
+				measuresUp=int(str(results.decode('UTF-8').split('#')[0]))
+				if measuresUp < 2:
+					time.sleep(1)
+			time.sleep(2)
+			return True
+		except Exception as e:
+			error = str(e)
+
+		countTry = countTry + 1
+		time.sleep(0.5)
+
+	if error != 'Nothing':
+		raise ContainerInformationFetchExc(error)
+	else:
+		return False
 
 def getErrorBasedOnLevel(str, e):
 	if ERROR_LEVEL == 2:

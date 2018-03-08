@@ -50,6 +50,9 @@
                 {% load static %}
                 <img src="{% static "sim/loading.gif" %}" alt="Loading..">
             </div>
+            <div id="debugStatements" style="position: absolute;bottom:0;width:100%;">
+                <p id="debugStatementsPara"></p>
+            </div>
         </div>
         <div id="menu1" class="tab-pane fade">
             <iframe id="ifm" src="http://{{terminalDomainName}}" style="position:relative; left: 0; right: 0; bottom: 0; top: 0px;" width="100%" height="100%" frameborder="0"></iframe>
@@ -66,18 +69,41 @@
             $('#clickForHome').click();
             console.log( "ready!" );
             $('#spinner').show();
+            var console2loaded = false;
             $.ajax({
                 type: "POST",
                 url: "/sim/unsecure_console2/?user={{userid}}",                
-                success: function(data){             
+                success: function(data){         
+                    console2loaded = true;    
                     $('#ajax-populate').html(data);
                     $('#spinner').hide();
+                    $('#debugStatements').hide();
                 },
                 error: function (response) {
                     $('#ajax-populate').html('<a>There is some error with the simulation or network.</a>');
                     $('#spinner').hide();
                 }           
             });
+
+            function printDebugStatements() {
+                $.ajax({
+                    type: "POST",
+                    url: "/sim/unsecure_debugStmts/?user={{userid}}",   
+                    success: function(data){     
+                        document.getElementById("debugStatementsPara").innerHTML = data;
+                        console.log(data);
+                        if(!console2loaded)
+                            setTimeout(printDebugStatements, 300);
+                    },
+                    error: function (response) {
+                        if(!console2loaded)
+                            setTimeout(printDebugStatements, 300);
+                    }    
+                });
+            }
+
+            // call printDebugStatements once - it will recurse itself if needed
+            printDebugStatements();
         });
     </script>
 

@@ -9,5 +9,7 @@ urlpatterns = [
 	path('unsecure_console/', views.unsecure_console, name='unsecure_console'),
 	path('unsecure_console1/', views.unsecure_console1, name='unsecure_console1'),
 	path('unsecure_console2/', views.unsecure_console2, name='unsecure_console2'),
+	path('debugStmts/', views.debugStmts, name='debugStmts'),
+	path('unsecure_debugStmts/', views.unsecure_debugStmts, name='unsecure_debugStmts'),
     path('', views.index, name='index'),
 ]

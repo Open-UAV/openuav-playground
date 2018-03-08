@@ -42,3 +42,14 @@ def measures(request):
 
 	output = output.decode('UTF-8').strip() + '#'
 	return HttpResponse(output)
+
+def debugStmts(request):
+	output = 'Debug Statements:'
+	try:
+		fo = open("/tmp/debug", "r")
+		lines = fo.readlines()
+		output = '<br />'.join(lines)
+		fo.close()
+	except:
+		output = 'Debug Statements: Nothing'
+	return HttpResponse(output)

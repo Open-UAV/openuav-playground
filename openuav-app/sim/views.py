@@ -87,7 +87,7 @@ def getNumUAVs(simulation_ip):
 			error = errorString
 
 		countTry = countTry + 1
-		time.sleep(0.5)
+		time.sleep(1)
 
 	if error != 'Nothing':
 		raise ContainerInformationFetchExc(error)
@@ -113,7 +113,7 @@ def isSimReady(simulation_ip):
 			error = str(e)
 
 		countTry = countTry + 1
-		time.sleep(0.5)
+		time.sleep(1)
 
 	if error != 'Nothing':
 		raise ContainerInformationFetchExc(error)

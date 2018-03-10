@@ -51,5 +51,5 @@ def debugStmts(request):
 		output = '<br />'.join(lines)
 		fo.close()
 	except:
-		output = 'Debug Statements: Nothing'
+		output = ''
 	return HttpResponse(output)

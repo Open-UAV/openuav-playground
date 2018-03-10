@@ -25,16 +25,24 @@ def index(request):
 # nvidia-docker run -it --net=openuavapp_default --name=openuavapp_openauv3 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/jdas/openuav-playground/samples/leader-follower:/simulation -e DISPLAY=:0 --entrypoint "/home/setup.sh" openuavapp_openuav
 
 def hostnameToIP(hostname):
-	cmd = ''' nslookup hostname | sed -n '6p' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'  '''
-	p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
-	p2 = subprocess.Popen(['sed', '-n', '''6p'''], 
-		stdin=p1.stdout, stdout=subprocess.PIPE)
-	p1.stdout.close()
-	p3 = subprocess.Popen(['grep', '-o', '''[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'''],        
-		stdin=p2.stdout,stdout=subprocess.PIPE)
-	p2.stdout.close()
-	output = p3.communicate()[0]
-	outputStr = output.decode('UTF-8').strip()
+	outputStr = ''
+	numTry = 30
+	countTry = 0
+
+	while outputStr == '' and countTry < numTry:
+		cmd = ''' nslookup hostname | sed -n '6p' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'  '''
+		p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
+		p2 = subprocess.Popen(['sed', '-n', '''6p'''], 
+			stdin=p1.stdout, stdout=subprocess.PIPE)
+		p1.stdout.close()
+		p3 = subprocess.Popen(['grep', '-o', '''[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'''],        
+			stdin=p2.stdout,stdout=subprocess.PIPE)
+		p2.stdout.close()
+		output = p3.communicate()[0]
+		outputStr = output.decode('UTF-8').strip()
+
+		countTry = countTry + 1
+		time.sleep(0.1)
 
 	if outputStr == '':
 		p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)

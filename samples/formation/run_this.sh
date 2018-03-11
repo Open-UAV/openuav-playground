@@ -19,18 +19,18 @@ cp /simulation/inputs/models/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/mod
 
 rm -f /simulation/outputs/*.csv
 rm -f /simulation/outputs/*.txt
-echo "Setup..."
+echo "Setup..." >> /tmp/debug.log
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
 sleep 20
 
-echo "Launch UAVs"
+echo "Launch UAVs" >> /tmp/debug.log
 
 for((i = 0;i<$num_uavs;i+=1))
 do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
     sleep 6
 done
-echo "Launch Sequencer"
+echo "Launch Sequencer" >> /tmp/debug.log
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt & 
 
 
@@ -40,7 +40,7 @@ rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
 roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &
 
-echo "Measures..."
+echo "Measures..." >> /tmp/debug.log
 for((i=1;i<=$num_uavs;i+=1))
 do
         /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /mavros$i/local_position/odom > /simulation/outputs/uav$i.csv &

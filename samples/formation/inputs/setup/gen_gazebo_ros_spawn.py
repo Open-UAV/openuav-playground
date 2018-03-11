@@ -27,7 +27,7 @@ for NUM in range(1, NUM_UAVs):
     simulator_udp_port = 14660
 
     uav_str = str(NUM)
-    DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_gazebo_ros_' + uav_str + '.launch'
+    DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_gazebo_ros' + uav_str + '.launch'
 
     print(uav_str)
     print(os.system(

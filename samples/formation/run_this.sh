@@ -17,6 +17,8 @@ rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 rm -f /simulation/outputs/*.csv
 rm -f /simulation/outputs/*.txt
 echo "Setup..." >> /tmp/debug.log
+
+
 python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs &> /dev/null &
 python /simulation/inputs/setup/gen_px4_sitl.py $num_uavs &> /dev/null &
 python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
@@ -25,8 +27,12 @@ python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
 gzserver
 sleep 1
 
-roslaunch px4 posix_sitl_multi_gazebo_ros.launch &
-sleep 30
+for((i=1;i<=$num_uavs;i+=1))
+do
+    roslaunch px4 posix_sitl_multi_gazebo_ros$num_uavs.launch &
+done
+
+sleep 3
 
 roslaunch px4 posix_sitl_multi_px4_sitl.launch &
 sleep 25
@@ -55,10 +61,12 @@ echo "Measures..." >> /tmp/debug.log
 for((i=1;i<=$num_uavs;i+=1))
 do
         /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /mavros$i/local_position/odom > /simulation/outputs/uav$i.csv &
-    done
-    /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /measure > /simulation/outputs/measure.csv &
+done
 
 
-    sleep $duration_seconds
-    cat /simulation/outputs/measure.csv | awk -F',' '{sum+=$2; ++n} END { print sum/n }' > /simulation/outputs/average_measure.txt
+/usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /measure > /simulation/outputs/measure.csv &
+
+
+sleep $duration_seconds
+cat /simulation/outputs/measure.csv | awk -F',' '{sum+=$2; ++n} END { print sum/n }' > /simulation/outputs/average_measure.txt
 

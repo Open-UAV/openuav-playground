@@ -23,14 +23,14 @@ python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
 
 sleep 1
 
-roslaunch px4 posix_sitl_multi_gazebo_ros.launch &> /dev/null &
+roslaunch px4 posix_sitl_multi_gazebo_ros.launch &
 sleep 20
 
-roslaunch px4 posix_sitl_multi_px4_sitl.launch &> /dev/null &
-sleep 10
+roslaunch px4 posix_sitl_multi_px4_sitl.launch &
+sleep 20
 
-roslaunch px4 posix_sitl_multi_mavros.launch &> /dev/null &
-sleep 4
+roslaunch px4 posix_sitl_multi_mavros.launch &
+sleep 10
 
 echo "Launch UAVs" >> /tmp/debug.log
 

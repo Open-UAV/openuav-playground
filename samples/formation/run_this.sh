@@ -20,7 +20,9 @@ cp /simulation/inputs/models/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/mod
 rm -f /simulation/outputs/*.csv
 rm -f /simulation/outputs/*.txt
 echo "Setup..." >> /tmp/debug.log
-python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
+python /simulation/inputs/setup/swarm.py $num_uavs &> /dev/null &
+python /simulation/inputs/setup/sitl-mavros.py $num_uavs &> /dev/null &
+
 sleep 20
 
 echo "Launch UAVs" >> /tmp/debug.log

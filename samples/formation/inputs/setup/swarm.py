@@ -10,6 +10,7 @@ PX4_HOME = '/root/src'
 print(NUM_UAVs)
 DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_gazebo_ros.launch'
 SOURCE = PX4_HOME + '/Firmware/launch/posix_sitl_openuav_swarm_base.launch'
+file_block = ''
 
 for NUM in range(1, NUM_UAVs):
 
@@ -52,7 +53,6 @@ for NUM in range(1, NUM_UAVs):
     launch_file = '$PX4_HOME/Firmware/launch/posix_sitl_multi_tmp.launch'
 
 
-    file_block = ''
 
     uav_block = '<arg name="x' + str(NUM) + '" default="0"/>' + \
                 '<arg name="y' + str(NUM) + '" default="' + str(NUM) +'"/>\n' + \

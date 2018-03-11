@@ -73,7 +73,8 @@ for NUM in range(1, NUM_UAVs):
 		<rosparam command="load" file="$(arg pluginlists_yaml)" /> \
 		<rosparam command="load" file="$(arg config_yaml)" /> \
     </node>'
-    file_block = uav_block + '\n' + mavros_block
+
+    file_block = file_block + '\n' + uav_block + '\n' + mavros_block
     print(file_block)
 
 print(os.system("cp " + SOURCE + " " + DEST))

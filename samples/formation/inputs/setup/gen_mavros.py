@@ -8,7 +8,7 @@ def replaceInFile(orig, repl, filename):
 NUM_UAVs = int(sys.argv[1]) + 1
 PX4_HOME = '/root/src'
 print(NUM_UAVs)
-DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_sitl_mavros.launch'
+DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_mavros.launch'
 SOURCE = PX4_HOME + '/Firmware/launch/posix_sitl_openuav_swarm_base.launch'
 file_block = ''
 
@@ -59,9 +59,7 @@ for NUM in range(1, NUM_UAVs):
         NUM) + '" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle' + str(NUM) + ')/$(arg vehicle' + str(
         NUM) + ').sdf"/>\n' + \
                 '<arg name="rcS' + str(
-        NUM) + '" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle' + str(NUM) + ')"/>\n' + \
-                '<node name="sitl' + str(
-        NUM) + '" pkg="px4" type="px4" output="screen" args="$(find px4) $(arg rcS' + str(NUM) + ')"></node>\n'
+        NUM) + '" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle' + str(NUM) + ')"/>\n'
 
 
     mavros_block = '<node pkg="mavros" type="mavros_node" name="mavros'+ str(NUM) +'" required="true" clear_params="true" output="$(arg log_output)"> \

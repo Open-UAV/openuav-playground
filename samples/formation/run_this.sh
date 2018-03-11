@@ -17,16 +17,20 @@ cp /simulation/inputs/models/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/mod
 rm -f /simulation/outputs/*.csv
 rm -f /simulation/outputs/*.txt
 echo "Setup..." >> /tmp/debug.log
-python /simulation/inputs/setup/swarm.py $num_uavs &> /dev/null &
-python /simulation/inputs/setup/sitl-mavros.py $num_uavs &> /dev/null &
+python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs &> /dev/null &
+python /simulation/inputs/setup/gen_px4_sitl.py $num_uavs &> /dev/null &
+python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
+
 sleep 1
 
 roslaunch px4 posix_sitl_multi_gazebo_ros.launch &> /dev/null &
 sleep 20
 
-roslaunch px4 posix_sitl_multi_sitl_mavros.launch &> /dev/null &
+roslaunch px4 posix_sitl_multi_px4_sitl.launch &> /dev/null &
 sleep 10
 
+roslaunch px4 posix_sitl_multi_mavros.launch &> /dev/null &
+sleep 4
 
 echo "Launch UAVs" >> /tmp/debug.log
 

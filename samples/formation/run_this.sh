@@ -41,14 +41,14 @@ sleep 5
 
 echo "launching mavros(s) ..." >> /tmp/debug.log
 roslaunch px4 posix_sitl_multi_mavros.launch & /dev/null &
-sleep 10
+sleep 5
 
 echo "Launch UAVs" >> /tmp/debug.log
 
 for((i = 0;i<$num_uavs;i+=1))
 do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
-    sleep 6
+    sleep 1
 done
 echo "Launch Sequencer" >> /tmp/debug.log
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &

@@ -8,7 +8,6 @@ def replaceInFile(orig, repl, filename):
 NUM_UAVs = int(sys.argv[1]) + 1
 PX4_HOME = '/root/src'
 print(NUM_UAVs)
-DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_gazebo_ros.launch'
 SOURCE = PX4_HOME + '/Firmware/launch/posix_sitl_openuav_swarm_base.launch'
 file_block = ''
 
@@ -28,6 +27,8 @@ for NUM in range(1, NUM_UAVs):
     simulator_udp_port = 14660
 
     uav_str = str(NUM)
+    DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_gazebo_ros_' + uav_str + '.launch'
+
     print(uav_str)
     print(os.system(
         "cp -r " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-1 " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-tmp-" + uav_str))
@@ -66,12 +67,12 @@ for NUM in range(1, NUM_UAVs):
                 'args="-sdf -file $(arg sdf' + str(NUM) + ') -model $(arg vehicle' + str(NUM) + ') -x $(arg x' + str(
         NUM) + ') -y $(arg y' + str(
         NUM) + ') -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>\n'
-    file_block = file_block + '\n' + uav_block
+    file_block = uav_block
 
-print(file_block)
-print(os.system("cp " + SOURCE + " " + DEST))
-f=open(DEST,"a")
-f.write(file_block + '\n </launch>')
-f.close()
+    print(file_block)
+    print(os.system("cp " + SOURCE + " " + DEST))
+    f=open(DEST,"a")
+    f.write(file_block + '\n </launch>')
+    f.close()
 
 print('DRONES CREATED')

@@ -19,9 +19,9 @@ rm -f /simulation/outputs/*.txt
 echo "Setup..." >> /tmp/debug.log
 
 
-python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs &> /dev/null &
-python /simulation/inputs/setup/gen_px4_sitl.py $num_uavs &> /dev/null &
-python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
+python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs 
+python /simulation/inputs/setup/gen_px4_sitl.py $num_uavs 
+python /simulation/inputs/setup/gen_mavros.py $num_uavs 
 
 
 sleep 1
@@ -29,16 +29,18 @@ sleep 1
 for((i=1;i<=$num_uavs;i+=1))
 do
 echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
-    roslaunch px4 posix_sitl_multi_gazebo_ros$i.launch &
-sleep 6
+    roslaunch px4 posix_sitl_multi_gazebo_ros$i.launch & /dev/null &
+echo "launching uav$i ..." >> /tmp/debug.log
+sleep 5
 done
 
-sleep 4
 
-roslaunch px4 posix_sitl_multi_px4_sitl.launch &
-sleep 4
+echo "launching sitl(s)..." >> /tmp/debug.log
+roslaunch px4 posix_sitl_multi_px4_sitl.launch & /dev/null &
+sleep 5
 
-roslaunch px4 posix_sitl_multi_mavros.launch &
+echo "launching mavros(s) ..." >> /tmp/debug.log
+roslaunch px4 posix_sitl_multi_mavros.launch & /dev/null &
 sleep 10
 
 echo "Launch UAVs" >> /tmp/debug.log

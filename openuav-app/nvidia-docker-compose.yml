@@ -15,7 +15,7 @@ services:
     - /dev/nvidia-uvm
     - /dev/nvidia-uvm-tools
     volumes:
-    - nvidia_driver_384.90:/usr/local/nvidia:ro
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
   openuav:
     build: dockerfiles/openuav_sample/
     devices:
@@ -24,7 +24,7 @@ services:
     - /dev/nvidiactl
     - /dev/nvidia-uvm
     - /dev/nvidia-uvm-tools
-    entrypoint: /simulation/run_this.sh
+    entrypoint: /home/setup.sh
     environment:
     - DISPLAY=$DISPLAY
     expose:
@@ -33,13 +33,13 @@ services:
     - '80'
     - '9090'
     volumes:
-    - /home/abhsingh/Laptop/openuav/samples/leader-follower/simulation:/simulation
+    - ../samples/testSimulation:/simulation
     - /tmp/.X11-unix:/tmp/.X11-unix
-    - nvidia_driver_384.90:/usr/local/nvidia:ro
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
   web:
     build: dockerfiles/django/
-    command: bash -c "python manage.py makemigrations && python manage.py migrate
-      && python3 manage.py runserver 0.0.0.0:80"
+    command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py
+      makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:80"
     depends_on:
     - db
     devices:
@@ -53,8 +53,8 @@ services:
     restart: always
     volumes:
     - .:/code
-    - nvidia_driver_384.90:/usr/local/nvidia:ro
+    - nvidia_driver_384.111:/usr/local/nvidia:ro
 version: '2'
 volumes:
-  nvidia_driver_384.90:
+  nvidia_driver_384.111:
     external: true

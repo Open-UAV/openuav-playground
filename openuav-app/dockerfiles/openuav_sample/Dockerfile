@@ -100,15 +100,6 @@ ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 ENV TF_NEED_CUDA 1
 ENV TF_CUDA_COMPUTE_CAPABILITIES=3.0,3.5,5.2,6.0,6.1
 
-RUN pip install wheel
-RUN tensorflow/tools/ci_build/builds/configured GPU \
-    bazel build -c opt --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" \
-        tensorflow/tools/pip_package:build_pip_package
-RUN bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip
-RUN pip --no-cache-dir install --upgrade /tmp/pip/tensorflow-*.whl
-RUN rm -rf /tmp/pip && \
-    rm -rf /root/.cache
-# Clean up pip wheel and Bazel cache when done.
 
 RUN cd ~/src/Firmware && \
     git remote add openuav-master https://github.com/Open-UAV/Firmware && \

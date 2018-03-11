@@ -29,7 +29,7 @@ sleep 1
 for((i=1;i<=$num_uavs;i+=1))
 do
 echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
-    roslaunch px4 posix_sitl_multi_gazebo_ros$num_uavs.launch &
+    roslaunch px4 posix_sitl_multi_gazebo_ros$i.launch &
 sleep 4
 done
 

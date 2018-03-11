@@ -10,6 +10,7 @@ PX4_HOME = '/root/src'
 print(NUM_UAVs)
 DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_sitl_mavros.launch'
 SOURCE = PX4_HOME + '/Firmware/launch/posix_sitl_openuav_swarm_base.launch'
+file_block = ''
 
 for NUM in range(1, NUM_UAVs):
 
@@ -52,7 +53,6 @@ for NUM in range(1, NUM_UAVs):
     launch_file = '$PX4_HOME/Firmware/launch/posix_sitl_multi_tmp.launch'
 
 
-    file_block = ''
 
 
     mavros_block = '<node pkg="mavros" type="mavros_node" name="mavros'+ str(NUM) +'" required="true" clear_params="true" output="$(arg log_output)"> \

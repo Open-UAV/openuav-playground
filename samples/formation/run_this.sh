@@ -24,11 +24,11 @@ python /simulation/inputs/setup/gen_px4_sitl.py $num_uavs &> /dev/null &
 python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
 
 
-gzserver
 sleep 1
 
 for((i=1;i<=$num_uavs;i+=1))
 do
+echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
     roslaunch px4 posix_sitl_multi_gazebo_ros$num_uavs.launch &
 done
 

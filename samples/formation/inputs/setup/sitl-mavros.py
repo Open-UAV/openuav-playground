@@ -52,7 +52,16 @@ for NUM in range(1, NUM_UAVs):
 
     launch_file = '$PX4_HOME/Firmware/launch/posix_sitl_multi_tmp.launch'
 
-
+    uav_block = '<arg name="x' + str(NUM) + '" default="0"/>' + \
+                '<arg name="y' + str(NUM) + '" default="' + str(NUM) + '"/>\n' + \
+                '<arg name="vehicle' + str(NUM) + '" default="f450-tmp-' + str(NUM) + '"/>\n' + \
+                '<arg name="sdf' + str(
+        NUM) + '" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle' + str(NUM) + ')/$(arg vehicle' + str(
+        NUM) + ').sdf"/>\n' + \
+                '<arg name="rcS' + str(
+        NUM) + '" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle' + str(NUM) + ')"/>\n' + \
+                '<node name="sitl' + str(
+        NUM) + '" pkg="px4" type="px4" output="screen" args="$(find px4) $(arg rcS' + str(NUM) + ')"></node>\n'
 
 
     mavros_block = '<node pkg="mavros" type="mavros_node" name="mavros'+ str(NUM) +'" required="true" clear_params="true" output="$(arg log_output)"> \
@@ -64,7 +73,7 @@ for NUM in range(1, NUM_UAVs):
 		<rosparam command="load" file="$(arg pluginlists_yaml)" /> \
 		<rosparam command="load" file="$(arg config_yaml)" /> \
     </node>'
-    file_block = file_block + '\n' + mavros_block
+    file_block = uav_block + '\n' + mavros_block
     print(file_block)
 
 print(os.system("cp " + SOURCE + " " + DEST))

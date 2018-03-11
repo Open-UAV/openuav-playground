@@ -61,8 +61,6 @@ for NUM in range(1, NUM_UAVs):
         NUM) + '" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle' + str(NUM) + ')/$(arg vehicle' + str(NUM) + ').sdf"/>\n' + \
                 '<arg name="rcS' + str(
         NUM) + '" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle' + str(NUM) + ')"/>\n' + \
-                '<node name="sitl' + str(
-        NUM) + '" pkg="px4" type="px4" output="screen" args="$(find px4) $(arg rcS' + str(NUM) + ')"></node>\n' + \
                 '<node name="$(anon vehicle_spawn_' + str(
         NUM) + ')" output="screen" pkg="gazebo_ros" type="spawn_model"\n' + \
                 'args="-sdf -file $(arg sdf' + str(NUM) + ') -model $(arg vehicle' + str(NUM) + ') -x $(arg x' + str(

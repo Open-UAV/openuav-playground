@@ -24,7 +24,7 @@ python /simulation/inputs/setup/gen_mavros.py $num_uavs &> /dev/null &
 sleep 1
 
 roslaunch px4 posix_sitl_multi_gazebo_ros.launch &
-sleep 25
+sleep 30
 
 roslaunch px4 posix_sitl_multi_px4_sitl.launch &
 sleep 25

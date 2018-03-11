@@ -1,6 +1,6 @@
 #!/bin/bash
 source /root/.bashrc
-num_uavs=10
+num_uavs=7
 duration_seconds=3000
 FOLLOW_D_GAIN=1
 LOOP_EDGE=40

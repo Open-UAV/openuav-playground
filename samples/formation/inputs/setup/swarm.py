@@ -69,17 +69,6 @@ for NUM in range(1, NUM_UAVs):
         NUM) + ') -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>\n'
     file_block = file_block + '\n' + uav_block
 
-
-    mavros_block = '<node pkg="mavros" type="mavros_node" name="mavros'+ str(NUM) +'" required="true" clear_params="true" output="$(arg log_output)"> \
-		<param name="fcu_url" value="udp://:' + str(mavlink_onboard_remote+100*NUM) + '@localhost:' + str(mavlink_onboard_local+100*NUM) + '"/> \
-		<param name="gcs_url" value="" /> \
-		<param name="target_system_id" value="'+str(NUM)+'" /> \
-		<param name="target_component_id" value="'+str(NUM)+'" /> \
-		<param name="system_id" value="'+str(NUM+30)+'" /> \
-		<rosparam command="load" file="$(arg pluginlists_yaml)" /> \
-		<rosparam command="load" file="$(arg config_yaml)" /> \
-    </node>'
-    file_block = file_block + '\n' + mavros_block
     print(file_block)
     print(os.system("cp " + SOURCE + " " + DEST))
     f=open(DEST,"a")

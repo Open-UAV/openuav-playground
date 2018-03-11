@@ -128,6 +128,9 @@ RUN cd /home && \
 
 RUN sed -i '/force_color_prompt/s/^#//g' ~/.bashrc
 
+# for mavros global position in GPS to UTM conversions 
+RUN apt-get -y install ros-kinetic-geodesy
+
 ### Django set up to expose various states from the simulation container
 RUN apt-get -y install python3-pip
 RUN pip3 --no-cache-dir install Django

@@ -84,10 +84,10 @@ RUN mkdir /bazel && \
 
 # Download and build TensorFlow.
 
-RUN git clone https://github.com/tensorflow/tensorflow.git && \
-    cd tensorflow && \
-    git checkout r1.2
-WORKDIR /tensorflow
+#RUN git clone https://github.com/tensorflow/tensorflow.git && \
+#    cd tensorflow && \
+#    git checkout r1.2
+#WORKDIR /tensorflow
 
 # For Nivida
 LABEL com.nvidia.volumes.needed="nvidia_driver"

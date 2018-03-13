@@ -12,7 +12,7 @@ rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 
 ## world setup #
 #cp /simulation/inputs/world/empty.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
-cp /simulation/inputs/models/f450-1/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/models/f450-1/f450-1.sdf
+#cp /simulation/inputs/models/f450-1/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/models/f450-1/f450-1.sdf
 cp /simulation/inputs/setup/posix_sitl_openuav_swarm_base.launch /root/src/Firmware/launch/posix_sitl_openuav_swarm_base.launch
 
 
@@ -31,26 +31,26 @@ sleep 1
 for((i=1;i<=$num_uavs;i+=1))
 do
 echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
-    roslaunch px4 posix_sitl_multi_gazebo_ros$i.launch & /dev/null &
+    roslaunch px4 posix_sitl_multi_gazebo_ros$i.launch &> /dev/null &
 echo "launching uav$i ..." >> /tmp/debug
-sleep 5
+sleep 15
 done
 
 
 echo "launching sitl(s)..." >> /tmp/debug
-roslaunch px4 posix_sitl_multi_px4_sitl.launch & /dev/null &
-sleep 11
+roslaunch px4 posix_sitl_multi_px4_sitl.launch &> /dev/null &
+sleep 15
 
 echo "launching mavros(s) ..." >> /tmp/debug
-roslaunch px4 posix_sitl_multi_mavros.launch & /dev/null &
-sleep 3
+roslaunch px4 posix_sitl_multi_mavros.launch &> /dev/null &
+sleep 10
 
 echo "Launch UAVs" >> /tmp/debug
 
 for((i = 0;i<$num_uavs;i+=1))
 do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
-    sleep 3
+    sleep 5
 done
 echo "Launch Sequencer" >> /tmp/debug
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &

@@ -39,6 +39,7 @@ echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
 done
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &
 roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
+rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &
 
 for((i = 0;i<$num_uavs;i+=1))
 do
@@ -48,7 +49,6 @@ done
 echo "Launch Sequencer" >> /tmp/debug
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &
 
-rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
 roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &
 

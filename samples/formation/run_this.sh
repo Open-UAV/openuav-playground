@@ -44,8 +44,8 @@ rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/
 for((i = 0;i<$num_uavs;i+=1))
 do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
-    sleep 3
 done
+sleep 1
 echo "Launch Sequencer" >> /tmp/debug
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &
 

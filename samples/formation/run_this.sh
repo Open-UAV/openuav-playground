@@ -25,9 +25,6 @@ python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs
 python /simulation/inputs/setup/gen_px4_sitl.py $num_uavs 
 python /simulation/inputs/setup/gen_mavros.py $num_uavs 
 
-
-sleep 1
-
 for((i=1;i<=$num_uavs;i+=1))
 do
 echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
@@ -46,7 +43,7 @@ roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
 for((i = 0;i<$num_uavs;i+=1))
 do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
-    sleep 2
+    sleep 3
 done
 echo "Launch Sequencer" >> /tmp/debug
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &

@@ -32,6 +32,7 @@ echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
     roslaunch px4 posix_sitl_multi_gazebo_ros$i.launch &> /dev/null &
     until rostopic echo /gazebo/model_states | grep -m1 f450-tmp-$i ; do : ; done
     roslaunch px4 posix_sitl_multi_px4_sitl$i.launch &> /dev/null &
+    sleep 2
     roslaunch px4 posix_sitl_multi_mavros$i.launch &> /dev/null &
     until rostopic echo /mavros$i/state | grep -m1 "connected: True" ; do : ; done
     echo "launched uav$i ..." >> /tmp/debug

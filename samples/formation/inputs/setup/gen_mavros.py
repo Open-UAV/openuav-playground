@@ -2,18 +2,18 @@
 import sys
 import os
 
+
 def replaceInFile(orig, repl, filename):
-    os.system('sed -i "s/' + orig + '/' +repl + '/g" ' + filename)
+    os.system('sed -i "s/' + orig + '/' + repl + '/g" ' + filename)
+
 
 NUM_UAVs = int(sys.argv[1]) + 1
 PX4_HOME = '/root/src'
 print(NUM_UAVs)
-DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_mavros.launch'
 SOURCE = PX4_HOME + '/Firmware/launch/posix_sitl_openuav_swarm_base.launch'
 file_block = ''
 
 for NUM in range(1, NUM_UAVs):
-
     # mavlink
     # < mavlink_udp_port > simulator_udp_port < / mavlink_udp_port >
     # simulator start -s -u simulator_udp_port
@@ -28,24 +28,34 @@ for NUM in range(1, NUM_UAVs):
     simulator_udp_port = 14660
 
     uav_str = str(NUM)
+    DEST = PX4_HOME + '/Firmware/launch/posix_sitl_multi_mavros'+uav_str +'.launch'
+
     print(uav_str)
     print(os.system(
         "cp -r " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-1 " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-tmp-" + uav_str))
     print(os.system(
-        "mv " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-tmp-" + uav_str +"/f450-1.sdf " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-tmp-" + uav_str +"/f450-tmp-" + uav_str + ".sdf"))
+        "mv " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-tmp-" + uav_str + "/f450-1.sdf " + PX4_HOME + "/Firmware/Tools/sitl_gazebo/models/f450-tmp-" + uav_str + "/f450-tmp-" + uav_str + ".sdf"))
 
-    replaceInFile(str(simulator_udp_port), str(simulator_udp_port+100*NUM), PX4_HOME + '/Firmware/Tools/sitl_gazebo/models/f450-tmp-' + uav_str +'/f450-tmp-' + uav_str + '.sdf')
+    replaceInFile(str(simulator_udp_port), str(simulator_udp_port + 100 * NUM),
+                  PX4_HOME + '/Firmware/Tools/sitl_gazebo/models/f450-tmp-' + uav_str + '/f450-tmp-' + uav_str + '.sdf')
     os.system(
-        'cp '+ PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-1 ' + PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+        'cp ' + PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-1 ' + PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
 
-    replaceInFile(str(simulator_udp_port), str(simulator_udp_port+100*NUM), PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
-    replaceInFile(str(mavlink_start_port), str(mavlink_start_port+100*NUM), PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
-    replaceInFile(str(mavlink_onboard_local), str(mavlink_onboard_local+100*NUM), PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
-    replaceInFile(str(mavlink_onboard_remote), str(mavlink_onboard_remote+100*NUM), PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
-    replaceInFile('MAV_SYS_ID 2', 'MAV_SYS_ID ' + str(NUM), PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
-    replaceInFile('MAV_COMP_ID 2', 'MAV_COMP_ID ' + str(NUM), PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+    replaceInFile(str(simulator_udp_port), str(simulator_udp_port + 100 * NUM),
+                  PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+    replaceInFile(str(mavlink_start_port), str(mavlink_start_port + 100 * NUM),
+                  PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+    replaceInFile(str(mavlink_onboard_local), str(mavlink_onboard_local + 100 * NUM),
+                  PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+    replaceInFile(str(mavlink_onboard_remote), str(mavlink_onboard_remote + 100 * NUM),
+                  PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+    replaceInFile('MAV_SYS_ID 2', 'MAV_SYS_ID ' + str(NUM),
+                  PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
+    replaceInFile('MAV_COMP_ID 2', 'MAV_COMP_ID ' + str(NUM),
+                  PX4_HOME + '/Firmware/posix-configs/SITL/init/lpe/f450-tmp-' + uav_str)
 
-    replaceInFile('f450-1', 'f450-tmp-' + uav_str, PX4_HOME + '/Firmware/Tools/sitl_gazebo/models/f450-tmp-' + uav_str +'/f450-tmp-' + uav_str + '.sdf')
+    replaceInFile('f450-1', 'f450-tmp-' + uav_str,
+                  PX4_HOME + '/Firmware/Tools/sitl_gazebo/models/f450-tmp-' + uav_str + '/f450-tmp-' + uav_str + '.sdf')
     replaceInFile('uav_camera',
                   'uav_' + uav_str + '_camera',
                   PX4_HOME + '/Firmware/Tools/sitl_gazebo/models/f450-tmp-' + uav_str + '/f450-tmp-' + uav_str + '.sdf')
@@ -61,23 +71,23 @@ for NUM in range(1, NUM_UAVs):
                 '<arg name="rcS' + str(
         NUM) + '" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle' + str(NUM) + ')"/>\n'
 
-
-    mavros_block = '<node pkg="mavros" type="mavros_node" name="mavros'+ str(NUM) +'" required="true" clear_params="true" output="$(arg log_output)"> \
-		<param name="fcu_url" value="udp://:' + str(mavlink_onboard_remote+100*NUM) + '@localhost:' + str(mavlink_onboard_local+100*NUM) + '"/> \
+    mavros_block = '<node pkg="mavros" type="mavros_node" name="mavros' + str(NUM) + '" required="true" clear_params="true" output="$(arg log_output)"> \
+		<param name="fcu_url" value="udp://:' + str(mavlink_onboard_remote + 100 * NUM) + '@localhost:' + str(
+        mavlink_onboard_local + 100 * NUM) + '"/> \
 		<param name="gcs_url" value="" /> \
-		<param name="target_system_id" value="'+str(NUM)+'" /> \
-		<param name="target_component_id" value="'+str(NUM)+'" /> \
-		<param name="system_id" value="'+str(NUM+30)+'" /> \
+		<param name="target_system_id" value="' + str(NUM) + '" /> \
+		<param name="target_component_id" value="' + str(NUM) + '" /> \
+		<param name="system_id" value="' + str(NUM + 30) + '" /> \
 		<rosparam command="load" file="$(arg pluginlists_yaml)" /> \
 		<rosparam command="load" file="$(arg config_yaml)" /> \
     </node>'
 
-    file_block = file_block + '\n' + uav_block + '\n' + mavros_block
+    file_block = uav_block + '\n' + mavros_block
     print(file_block)
 
-print(os.system("cp " + SOURCE + " " + DEST))
-f=open(DEST,"a")
-f.write(file_block + '\n </launch>')
-f.close()
+    print(os.system("cp " + SOURCE + " " + DEST))
+    f = open(DEST, "a")
+    f.write(file_block + '\n </launch>')
+    f.close()
 
 print('DRONES CREATED')

@@ -115,7 +115,8 @@ RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.profile && \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-web-video-server \
-        ros-kinetic-image-geometry
+        ros-kinetic-image-geometry \
+        ros-kinetic-image-proc 
 RUN apt-get install -y ros-kinetic-rosbridge-server ros-kinetic-opencv-apps
 
 RUN cd ~/catkin_ws && \

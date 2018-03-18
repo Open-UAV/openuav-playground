@@ -5,14 +5,14 @@ def index(request):
     return HttpResponse("Hello, world. You're at the query index.")
 
 def numUavs(request):
-	cmd = '''cat /simulation/inputs/parameters/swarm.sh | grep num_uavs | grep -o -E '[0-9]' | tail -n1 '''
+	cmd = '''cat /simulation/inputs/parameters/swarm.sh | grep num_uavs | grep -o -E '([0-9]|[1-9][0-9])' | tail -n1 '''
 
 	try:
 		p1 = subprocess.Popen(['cat', '/simulation/inputs/parameters/swarm.sh'], stdout=subprocess.PIPE)
 		p2 = subprocess.Popen(['grep', 'num_uavs'], 
 			stdin=p1.stdout, stdout=subprocess.PIPE)
 		p1.stdout.close()
-		p3 = subprocess.Popen(['grep', '-o' , '-E', '''[0-9]'''],        
+		p3 = subprocess.Popen(['grep', '-o' , '-E', '''([0-9]|[1-9][0-9])'''],
 			stdin=p2.stdout,stdout=subprocess.PIPE)
 		p2.stdout.close()
 		p4 = subprocess.Popen(['tail', '-n1'], 

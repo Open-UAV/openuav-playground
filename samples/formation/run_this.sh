@@ -11,7 +11,7 @@ rm -f /root/src/Firmware/posix-configs/SITL/init/lpe/f450-tmp-*
 rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 
 ## world setup #
-#cp /simulation/inputs/world/empty.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
+cp /simulation/inputs/world/empty.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
 cp /simulation/inputs/models/f450-1/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/models/f450-1/f450-1.sdf
 cp /simulation/inputs/setup/posix_sitl_openuav_swarm_base.launch /root/src/Firmware/launch/posix_sitl_openuav_swarm_base.launch
 

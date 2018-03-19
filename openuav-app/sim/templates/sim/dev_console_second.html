@@ -23,10 +23,10 @@
     {% for _ in range %}
     <div class="row">
         <div class="col-lg-6">
-            <iframe id="video-1{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_front&bitrate=100000&quality=50" width="768px" height="600px" frameborder="0"></iframe>
+            <iframe id="video-1{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera_front/image_raw&bitrate=100000&quality=50" width="768px" height="600px" frameborder="0"></iframe>
         </div>
         <div class="col-lg-6">
-            <iframe id="video-2{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_down&bitrate=100000&quality=50" width="768px" height="600px" frameborder="0"></iframe>
+            <iframe id="video-2{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera_down/image_raw&bitrate=100000&quality=50" width="768px" height="600px" frameborder="0"></iframe>
         </div>
     </div>
     {% endfor %}

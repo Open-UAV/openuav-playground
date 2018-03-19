@@ -120,8 +120,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-image-proc 
 RUN apt-get install -y ros-kinetic-rosbridge-server ros-kinetic-opencv-apps
 
-RUN cd ~/catkin_ws/src
-RUN git clone https://github.com/RIVeR-Lab/apriltags_ros.git
+RUN cd ~/catkin_ws/src && \
+    git clone https://github.com/RIVeR-Lab/apriltags_ros.git
 RUN cd ~/catkin_ws && \
     catkin build
 

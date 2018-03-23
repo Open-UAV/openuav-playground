@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import urllib.request
 import time
+import string
 import subprocess
 from django.views.decorators.csrf import csrf_exempt
 from sim.exceptions import *
@@ -24,19 +25,27 @@ def index(request):
 # nvidia-docker run -it --net=openuavapp_default --name=openuavapp_openauv3 -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/jdas/openuav-playground/samples/leader-follower:/simulation -e DISPLAY=:0 --entrypoint "/home/setup.sh" openuavapp_openuav
 
 def hostnameToIP(hostname):
-	cmd = ''' nslookup hostname | sed -n '6p' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'  '''
-	p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
-	p2 = subprocess.Popen(['sed', '-n', '''6p'''], 
-		stdin=p1.stdout, stdout=subprocess.PIPE)
-	p1.stdout.close()
-	p3 = subprocess.Popen(['grep', '-o', '''[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'''],        
-		stdin=p2.stdout,stdout=subprocess.PIPE)
-	p2.stdout.close()
-	output = p3.communicate()[0]
-	outputStr = output.decode('UTF-8').strip()
+	outputStr = ''
+	numTry = 30
+	countTry = 0
+
+	while outputStr == '' and countTry < numTry:
+		cmd = ''' nslookup hostname | sed -n '6p' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'  '''
+		p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
+		p2 = subprocess.Popen(['sed', '-n', '''6p'''], 
+			stdin=p1.stdout, stdout=subprocess.PIPE)
+		p1.stdout.close()
+		p3 = subprocess.Popen(['grep', '-o', '''[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'''],        
+			stdin=p2.stdout,stdout=subprocess.PIPE)
+		p2.stdout.close()
+		output = p3.communicate()[0]
+		outputStr = output.decode('UTF-8').strip()
+
+		countTry = countTry + 1
+		time.sleep(0.1)
 
 	if outputStr == '':
-		p1 = subprocess.Popen(['nslookup', 'hostname'], stdout=subprocess.PIPE)
+		p1 = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
 		out = p1.communicate()
 
 		errorString = 'nslookup returns empty ;; \n'
@@ -67,32 +76,58 @@ def getUserIDWithDefault(request):
 	return userid
 
 def getNumUAVs(simulation_ip):
-	try:
-		num_uav_str=''
-		while num_uav_str=='':
-			results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/numUavs').read()
-			num_uav_str=str(results.decode('UTF-8').split('#')[0])
-			if num_uav_str=='':
-				time.sleep(1)
-		num_uavs = int(num_uav_str)
-		return num_uavs
-	except Exception as e:
-		errorString = str(e) + ' ;; \n'
-		errorString = errorString + 'IP: ' + simulation_ip + ' ;; \n'
-		raise ContainerInformationFetchExc(errorString)
+	error = 'Nothing'
+	numTry = 3
+	countTry = 0
+
+	while countTry < numTry:
+		try:
+			num_uav_str=''
+			while num_uav_str=='':
+				results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/numUavs').read()
+				num_uav_str=str(results.decode('UTF-8').split('#')[0])
+				if num_uav_str=='':
+					time.sleep(1)
+			num_uavs = int(num_uav_str)
+			return num_uavs
+		except Exception as e:
+			errorString = str(e) + ' ;; \n'
+			errorString = errorString + 'IP: ' + simulation_ip + ' ;; \n'
+			error = errorString
+
+		countTry = countTry + 1
+		time.sleep(1)
+
+	if error != 'Nothing':
+		raise ContainerInformationFetchExc(error)
+	else:
+		return -1
 
 def isSimReady(simulation_ip):
-	measuresUp = 0
-	try:
-		while measuresUp < 2:
-			results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/measures').read()
-			measuresUp=int(str(results.decode('UTF-8').split('#')[0]))
-			if measuresUp < 2:
-				time.sleep(1)
-		time.sleep(2)
-		return True
-	except Exception as e:
-		raise ContainerInformationFetchExc(str(e))
+	error = 'Nothing'
+	numTry = 3
+	countTry = 0
+
+	while countTry < numTry:
+		measuresUp = 0
+		try:
+			while measuresUp < 2:
+				results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/measures').read()
+				measuresUp=int(str(results.decode('UTF-8').split('#')[0]))
+				if measuresUp < 2:
+					time.sleep(1)
+			time.sleep(2)
+			return True
+		except Exception as e:
+			error = str(e)
+
+		countTry = countTry + 1
+		time.sleep(1)
+
+	if error != 'Nothing':
+		raise ContainerInformationFetchExc(error)
+	else:
+		return False
 
 def getErrorBasedOnLevel(str, e):
 	if ERROR_LEVEL == 2:
@@ -241,3 +276,34 @@ def unsecure_console2(request):
 	except Exception as e:	
 		return HttpResponse(render(request, 'sim/error.html', {'error' : getErrorBasedOnLevel('Internal Server Error.', str(e) + '; ' + repr(traceback.format_stack()))}))
 
+@csrf_exempt
+def debugStmts(request):
+	debugStatements = 'Debug:'
+	try:
+		userid = getUserIDWithoutDefault(request)
+		simNodeHostname = PROJECT_PREFIX + userid
+		simulation_ip = hostnameToIP(simNodeHostname)
+
+		results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/debugStmts').read()
+		debugStatements = str(results.decode('UTF-8'))
+		debugStatements = string.replace(debugStatements, '\r\n', '<br />')
+		debugStatements = string.replace(debugStatements, '\n', '<br />')
+	except Exception as e:
+		debugStatements = ''
+
+	return HttpResponse(debugStatements)
+
+@csrf_exempt
+def unsecure_debugStmts(request):
+	debugStatements = 'Debug:'
+	try:
+		userid = getUserIDWithDefault(request)
+		simNodeHostname = PROJECT_PREFIX + userid
+		simulation_ip = hostnameToIP(simNodeHostname)
+
+		results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/debugStmts').read()
+		debugStatements = str(results.decode('UTF-8'))
+	except Exception as e:
+		debugStatements = ''
+
+	return HttpResponse(debugStatements)

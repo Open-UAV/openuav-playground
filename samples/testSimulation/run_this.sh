@@ -11,6 +11,9 @@ rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 
 rm -f /simulation/outputs/*.csv
 echo "Setup..."
+echo "Setup..." >> /tmp/debug
+echo "Setup test ..." >> /tmp/debug
+echo "Setup test ..."
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
 sleep 15
 python /simulation/inputs/setup/testArmAll.py $num_uavs &> /dev/null &
@@ -43,4 +46,5 @@ do
 
     sleep 3600000
     cat /simulation/outputs/measure.csv | awk -F',' '{sum+=$2; ++n} END { print sum/n }' > /simulation/outputs/average_measure.txt
+echo "exiting test simulation container. should this have happened?"
 

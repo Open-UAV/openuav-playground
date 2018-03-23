@@ -4,16 +4,7 @@ source /simulation/inputs/parameters/swarm.sh
 source /opt/ros/kinetic/setup.bash
 source ~/catkin_ws/devel/setup.bash
 
-## Previous clean-up
-rm -rf /root/src/Firmware/Tools/sitl_gazebo/models/f450-tmp-*
-rm -f /root/src/Firmware/posix-configs/SITL/init/lpe/f450-tmp-*
-rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 
-# world setup #
-cp /simulation/inputs/world/empty.world /root/src/Firmware/Tools/sitl_gazebo/worlds/empty.world
-cp /simulation/inputs/models/f450-1/f450-1.sdf /root/src/Firmware/Tools/sitl_gazebo/models/f450-1/f450-1.sdf
-
-rm -f /simulation/outputs/*.csv
 echo "Setup..."
 python /simulation/inputs/setup/testCreateUAVSwarm.py $num_uavs &> /dev/null &
 sleep 15

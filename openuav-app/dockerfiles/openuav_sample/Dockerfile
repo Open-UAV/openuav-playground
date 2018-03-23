@@ -1,6 +1,6 @@
 FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
-MAINTAINER Jnaneshwar Das <jnaneshwar.das@gmail.com> / Matt Schmittle <schmttle@udel.edu> / Abhijeet Singh <>
+MAINTAINER Jnaneshwar Das <jnaneshwar.das@gmail.com> / Matt Schmittle <schmttle@udel.edu> / Abhijeet Singh <abhsingh@seas.upenn.edu>
 
 RUN apt-get update && apt-get install -y apt-utils \
         git
@@ -84,10 +84,10 @@ RUN mkdir /bazel && \
 
 # Download and build TensorFlow.
 
-RUN git clone https://github.com/tensorflow/tensorflow.git && \
-    cd tensorflow && \
-    git checkout r1.2
-WORKDIR /tensorflow
+#RUN git clone https://github.com/tensorflow/tensorflow.git && \
+#    cd tensorflow && \
+#    git checkout r1.2
+#WORKDIR /tensorflow
 
 # For Nivida
 LABEL com.nvidia.volumes.needed="nvidia_driver"
@@ -100,15 +100,6 @@ ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 ENV TF_NEED_CUDA 1
 ENV TF_CUDA_COMPUTE_CAPABILITIES=3.0,3.5,5.2,6.0,6.1
 
-RUN pip install wheel
-RUN tensorflow/tools/ci_build/builds/configured GPU \
-    bazel build -c opt --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" \
-        tensorflow/tools/pip_package:build_pip_package
-RUN bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip
-RUN pip --no-cache-dir install --upgrade /tmp/pip/tensorflow-*.whl
-RUN rm -rf /tmp/pip && \
-    rm -rf /root/.cache
-# Clean up pip wheel and Bazel cache when done.
 
 RUN cd ~/src/Firmware && \
     git remote add openuav-master https://github.com/Open-UAV/Firmware && \
@@ -124,9 +115,13 @@ RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.profile && \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-web-video-server \
-        ros-kinetic-image-geometry
+        ros-kinetic-image-geometry \
+        ros-kinetic-image-transport-plugins \
+        ros-kinetic-image-proc 
 RUN apt-get install -y ros-kinetic-rosbridge-server ros-kinetic-opencv-apps
 
+RUN cd ~/catkin_ws/src && \
+    git clone https://github.com/RIVeR-Lab/apriltags_ros.git
 RUN cd ~/catkin_ws && \
     catkin build
 
@@ -136,6 +131,9 @@ RUN cd /home && \
     ./install_geographiclib_datasets.sh
 
 RUN sed -i '/force_color_prompt/s/^#//g' ~/.bashrc
+
+# for mavros global position in GPS to UTM conversions 
+RUN apt-get -y install ros-kinetic-geodesy
 
 ### Django set up to expose various states from the simulation container
 RUN apt-get -y install python3-pip
@@ -158,10 +156,10 @@ RUN cd /wetty && git clone https://github.com/krishnasrinivas/wetty && \
 # Adding user term and giving permissions
 RUN useradd -d /simulation -m -s /bin/bash term
 RUN echo 'term:term' | chpasswd
-RUN chmod -R 777 /root/src && chmod -R 777 /root/catkin_ws && \
-    chmod -R 777 /simulation && \
-    chmod -R 777 /opt/ros
-RUN find /root -type d -exec chmod 755 {} \;
+#RUN chmod -R 777 /root/src && chmod -R 777 /root/catkin_ws && \
+#    chmod -R 777 /simulation && \
+#    chmod -R 777 /opt/ros
+#RUN find /root -type d -exec chmod 755 {} \;
 RUN sed -i 's/LOGIN_TIMEOUT\t\t60/LOGIN_TIMEOUT\t\t7000/g' /etc/login.defs
 
 # Ensure the setup.sh is in the last, so that we can build again quickly if setup changes

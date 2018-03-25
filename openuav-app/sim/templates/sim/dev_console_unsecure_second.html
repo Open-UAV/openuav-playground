@@ -5,6 +5,10 @@
                 {% for _ in range %}
                 <polygon id="/traingle-{{forloop.counter}}" points="25,6 10,40 40,40" style="fill:lime;stroke:purple;stroke-width:1" />
                 <circle id="/mavros{{forloop.counter}}/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="grey" /> 
+
+                <script>
+                    document.getElementById("/traingle-{{forloop.counter}}").style.fill = randomColor();
+                </script>
                 {% endfor %}
             </svg>
 

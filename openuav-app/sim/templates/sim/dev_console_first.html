@@ -13,6 +13,9 @@
     <script type="text/javascript" src="https://openuav.us/scripts/eventemitter2.js"></script>
     <script type="text/javascript" src="https://openuav.us/scripts/roslib.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+
+    {% load static %}
+    <script src="{% static "sim/randomColor.js" %}"></script>
     <title>UAV Simulation</title>
 </head>
 
@@ -47,7 +50,6 @@
             </div>
 
             <div id="spinner" style="position: absolute;left:50%;top:50%;">
-                {% load static %}
                 <img src="{% static "sim/loading.gif" %}" alt="Loading..">
             </div>
             <div id="debugStatements" style="position: absolute;bottom:0;width:100%;">

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "++++++++INIT++++++++++"
+
 source /simulation/inputs/parameters/swarm.sh
 source /opt/ros/kinetic/setup.bash
 source ~/catkin_ws/devel/setup.bash
@@ -18,7 +20,7 @@ cp /simulation/inputs/setup/posix_sitl_openuav_swarm_base.launch /root/src/Firmw
 
 rm -f /simulation/outputs/*.csv
 rm -f /simulation/outputs/*.txt
-echo "Setup..." >> /tmp/debug
+echo "Setup..." #>> /tmp/debug
 
 
 python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs 
@@ -47,13 +49,13 @@ do
     python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
 done
 sleep 1
-echo "Launch Sequencer" >> /tmp/debug
+echo "Launch Sequencer" #>> /tmp/debug
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &
 
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
 roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &
 
-echo "Measures..." >> /tmp/debug
+echo "Measures..." #>> /tmp/debug
 for((i=1;i<=$num_uavs;i+=1))
 do
         /usr/bin/python -u /opt/ros/kinetic/bin/rostopic echo -p /mavros$i/local_position/odom > /simulation/outputs/uav$i.csv &

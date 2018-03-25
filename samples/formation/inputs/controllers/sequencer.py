@@ -10,6 +10,8 @@ import sys
 import math
 import tf
 import time
+import numpy as np
+
 
 from std_msgs.msg import Int8, Bool, Float64, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
 from std_srvs.srv import Empty
@@ -38,7 +40,20 @@ class TestSequence:
 	sum_stat = Int8()
 	sum_stat.data = 0
 	
-        # subscribing to each uav's status
+	#making Anna's Code
+
+	print 'ls -> ' + str(subprocess.check_output('ls /simulation/AnnaCode', shell=True))
+	print 'make -> ' + str(subprocess.check_output('make /simulation/AnnaCode', shell=True))
+	#print 'cd ->' + str(subprocess.check_output('cd /simulation/AnnaCode', shell=True))
+	#print 'ls -> ' + str(subprocess.check_output('ls', shell=True, cwd = '/simulation/AnnaCode'))
+	
+
+
+
+
+
+ 
+	# subscribing to each uav's status
         for i in range(NUM_UAV):
             
 	    exec ('def status_cb' + str(i) + '(msg): status[' + str(i) + '] = msg')
@@ -69,12 +84,44 @@ class TestSequence:
 
         while not rospy.is_shutdown():
 		publish = True
+
 		for i in range(NUM_UAV): 
-			if status[i].data != self.command.data[3]:
+			if status[i].data < self.command.data[3]:
 				publish = False
-		if publish and self.iterator < 5: 
+
+		if publish and self.iterator < 5:
+ 
 			self.command.data = self.nextCommand()
 			pub.publish(self.command)
+			print 'published  - ' + str(self.command.data)
+			continue #continue past next if check so publish goes back to false 
+
+		if publish and self.iterator > 4 and self.iterator < 13:		
+			for i in range(NUM_UAV): 
+				print status[i].data
+				print status[i].data < self.command.data[3]
+			print self.command.data[3]
+			print publish
+
+			if self.iterator == 5:
+				print 'running wrapper'
+				sys.stdout.flush()
+				#print 'wrapper -> \n' + str(subprocess.check_output('python mpcpsowrapper.py 0 1', shell = True, cwd = '/simulation/AnnaCode'))
+				config = np.loadtxt('/simulation/AnnaCode/config0_0.txt')
+				print config.ndim
+				print config.shape
+				print config
+				for i in range (0, config.shape[0] - 1):
+					if config[i,0] == 0:
+						config = np.delete(config, (range(i,config.shape[0])), axis = 0)
+						break
+				print '\n\n\n\n\n\n\n'	
+				print config
+				np.savetxt('/simulation/AnnaCode/config0_0.txt',config)
+			self.command.data = self.nextCommand()
+			pub.publish(self.command)
+			print 'published - ' + str(self.command.data)
+
 		sys.stdout.flush() 
 
 	
@@ -82,8 +129,10 @@ class TestSequence:
         self.status = msg
 	                  
     def nextCommand(self):
-	if self.iterator == 4:                #flip to velocity control
-		temp = [0,0,30,self.iterator]
+	if self.iterator > 4:
+		temp = [0,0,0, self.iterator]
+	elif self.iterator == 4:                #flip to velocity control
+		temp = [0,0,30,self.iterator]	
 	elif self.iterator == 3:
 		temp = [0,0,30,self.iterator]
 	elif self.iterator == 2:

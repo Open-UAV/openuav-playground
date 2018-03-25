@@ -11,6 +11,7 @@ import math
 import tf
 import time
 import geodesy
+import numpy as np
 
 from std_msgs.msg import Float64, Float64MultiArray, Int8
 from std_srvs.srv import Empty
@@ -25,7 +26,9 @@ from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Vect
 # UAV'S NUMBERED 0 -> NUM_UAV - 1
 # MAKE SURE this_uav feed follows this scheme in run_this.sh
 # /mavros topics follow 1 -> NUM_UAV
-# Notes
+#
+#
+# self Notes
 #	-random drones not initializing, cant consistently recreate issue 
 #	-commands get to velocity control and scramble
  
@@ -43,7 +46,10 @@ class TestFormation:
 	print 'init'	
 	print 'this uav = ' + str(this_uav)
 	print 'num uav = ' + str(NUM_UAV)
-
+	print 'dir_path = ' + str(os.path.dirname(os.path.realpath(__file__)))
+	print 'cwd = ' + str(os.getcwd())
+	#print 'ls -> ' + str(subprocess.check_output("ls /simulation/AnnaCode", shell = True))
+	#print 'make -> ' + str(subprocess.check_output("make /simulation/AnnaCode", shell=True))
     	global cur_pose 
 	global cur_state
 	global cur_vel
@@ -57,6 +63,10 @@ class TestFormation:
 	des_pose = PoseStamped() 	
 	des_vel = TwistStamped()
 	des_vel.header.frame_id = "map"	
+
+	t = 0 #time at start of rotation
+	ttR = 5 #time to rotate
+
 
         rospy.init_node('offboard_test'+str(this_uav), anonymous=True)
 	rate = rospy.Rate(100) #Hz
@@ -114,17 +124,13 @@ class TestFormation:
         print cur_state[this_uav]
 	print '---------------arming-----------------------'
 	
-	t = time.clock()
 	print '----WAITING FOR STANDBY STATUS---'
 	while True:
 		pose_pub.publish(des_pose)
 		if cur_state[this_uav].system_status == 3:
 			print cur_state[this_uav]
 			break
-	#	elif time.clock() - t > 30:
-	#		print 'TIMEOUT'
-	#		break
-	
+
 	print 'INITIAL POSITION'
 	print cur_globalPose[this_uav]
 
@@ -191,37 +197,44 @@ class TestFormation:
 				print exc
 		#temp end
 
-	    self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
-	    
-	    if self.convergence < .5 and self.status != Int8(self.command.data[3]):
-		self.status = Int8(self.command.data[3])
-		print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
-		print 'Current Pose - ' + str(cur_pose[this_uav].pose)
-		status_pub.publish(self.status)
 	    if self.command.data[3] > -1 and self.command.data[3] < 4:
+
             	des_pose.pose.position.x = self.command.data[0] + self.command.data[2]*math.sin((this_uav * 2 * math.pi)/NUM_UAV)
             	des_pose.pose.position.y = self.command.data[1] + self.command.data[2]*math.cos((this_uav * 2 * math.pi)/NUM_UAV)
 	    	des_pose.pose.position.z = 25
+		
+		self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
+		    
+		if self.convergence < .5 and self.status != Int8(self.command.data[3]):
+
+		    self.status = Int8(self.command.data[3])
+		    print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
+		    print 'Current Pose - ' + str(cur_pose[this_uav].pose)
+		    status_pub.publish(self.status)
+
 		pose_pub.publish(des_pose)
-	    if self.command.data[3] > 3:
+	    
+	    if self.command.data[3] == 4:
+		
+		#timing on rotation
+		if t == 0:
+			t = time.clock()
+			print t
+		if time.clock() > t + ttR:	
+			self.status = Int8(self.command.data[3])
+			print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
+			print 'Current Pose - ' + str(cur_pose[this_uav].pose)
+			status_pub.publish(self.status)
+		
 
 		r = math.sqrt(math.pow(cur_pose[this_uav].pose.position.x,2) + math.pow(cur_pose[this_uav].pose.position.y,2))
 
 		theta = math.atan2(cur_pose[this_uav].pose.position.y, cur_pose[this_uav].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
 		theta_plus = math.atan2(cur_pose[plus_uav].pose.position.y, cur_pose[plus_uav].pose.position.x) % (2*math.pi)
 		theta_minus = math.atan2(cur_pose[minus_uav].pose.position.y, cur_pose[minus_uav].pose.position.x) % (2*math.pi) 
-	
-
-
 		
-		#print  math.atan2(cur_pose[0].pose.position.y, cur_pose[0].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
-		#print  math.atan2(cur_pose[1].pose.position.y, cur_pose[1].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
-		#print  math.atan2(cur_pose[2].pose.position.y, cur_pose[2].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
-		#print  math.atan2(cur_pose[3].pose.position.y, cur_pose[3].pose.position.x) % (2*math.pi)
-		#print  math.atan2(cur_pose[4].pose.position.y, cur_pose[4].pose.position.x) % (2*math.pi)
-	
-
 		
+
 		#deal with wrap around
 		if theta_minus < theta: #yea looks backwards
 			dtheta_minus = (theta_minus + 2*math.pi) - theta
@@ -231,6 +244,9 @@ class TestFormation:
 			dtheta_plus = (theta + 2*math.pi) - theta_plus
 		else:	
 			dtheta_plus = theta - theta_plus
+		
+
+
 		#theta_des = ((theta_plus + theta_minus)/2)  #%(2*math.pi)	#abs pos of theta_des
 		#if abs((theta_des + 2*math.pi) - theta) < abs(theta_des - theta):
 		#	theta_des = (theta_des + 2*math.pi)
@@ -243,21 +259,48 @@ class TestFormation:
 		#	thetaDot = math.copysign(((2*math.pi) - math.fabs(theta_des - theta))/2, (theta_des - theta))
 		#	print 'theta = '+ str(theta) + ' theta_minus = '+str(theta_minus)+' theta_plus = '+str(theta_plus)+ ' theta_des = '+ str(theta_des) + ' thetaDot = ' + str(thetaDot) 
 		#else:
-		thetaDot = (dtheta_minus - dtheta_plus) #even more backwards....
-		print 'theta = '+ str(theta) + ' thetaDot = '+ str(thetaDot) + ' dtheta_plus = ' + str(dtheta_plus)+ ' dtheta_minus = ' + str(dtheta_minus)
-
 		
 
-		thetaDot =  thetaDot*5 + .32 
+		thetaDot = (dtheta_minus - dtheta_plus) #even more backwards....
+		#print 'theta = '+ str(theta) + ' thetaDot = '+ str(thetaDot) + ' dtheta_plus = ' + str(dtheta_plus)+ ' dtheta_minus = ' + str(dtheta_minus)
+		
+
+		thetaDot =  thetaDot*10 + 2 
 		rDot = (self.command.data[2] - r) * 10
 	
-		des_vel.twist.linear.x = rDot*math.cos(theta) - r*thetaDot*math.sin(theta)
-		des_vel.twist.linear.y = rDot*math.sin(theta) + r*thetaDot*math.cos(theta)
-
-		#des_vel.twist.linear.x = (self.command.data[2] * math.sin((this_uav * 2 * math.pi)/NUM_UAV) - cur_pose[this_uav].pose.position.x) * .5
-		#des_vel.twist.linear.y = (self.command.data[2] * math.cos((this_uav * 2 * math.pi)/NUM_UAV) - cur_pose[this_uav].pose.position.y) * .5
+		des_vel.twist.linear.x = (rDot*math.cos(theta) - r*thetaDot*math.sin(theta)) * 2
+		des_vel.twist.linear.y = (rDot*math.sin(theta) + r*thetaDot*math.cos(theta)) * 2
 		des_vel.twist.linear.z = (25 - cur_pose[this_uav].pose.position.z) * .5 
 		vel_pub.publish(des_vel)
+
+
+	    if self.command.data[3] == 5:
+		config = np.loadtxt('/simulation/AnnaCode/config0_0.txt')		
+            	#print config[0, this_uav]
+		self.status = Int8(self.command.data[3])
+		print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
+		print 'Current Pose - ' + str(cur_pose[this_uav].pose)
+
+		status_pub.publish(self.status)
+
+	    if self.command.data[3] > 5:
+
+            	des_pose.pose.position.x = config[ int(self.command.data[3] - 6), (4*this_uav)]
+            	des_pose.pose.position.y = config[ int(self.command.data[3] - 6), (4*this_uav) + 1 ]
+	    	des_pose.pose.position.z = 25
+		
+		self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
+		    
+		if self.convergence < .5 and self.status != Int8(self.command.data[3]):
+
+		    self.status = Int8(self.command.data[3])
+		    print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
+		    print 'Current Pose - ' + str(cur_pose[this_uav].pose)
+		    print 'Cmd Pose - (' + str(config[ int(self.command.data[3] - 6), (4*this_uav) ]) + ',' + str(config[ int(self.command.data[3] - 6) ,(4*this_uav) + 1 ]) + ')'
+		    status_pub.publish(self.status)
+		pose_pub.publish(des_pose)
+
+
 	    rate.sleep()
 		#azimuth = math.atan2(self.leader_pose.pose.position.y-self.curr_pose.pose.position.y, self.leader_pose.pose.position.x-self.curr_pose.pose.position.x)
                 #quaternion = tf.transformations.quaternion_from_euler(0, 0, azimuth)

@@ -51,6 +51,7 @@ rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/
 python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE $ALTITUDE 1 0 &> /dev/null &
 python /simulation/inputs/setup/testArmAll.py $num_uavs &> /dev/null &
 
+sleep 6
 
 for((i=1;i<$num_uavs;i+=1))
 do

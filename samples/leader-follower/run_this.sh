@@ -44,6 +44,7 @@ echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
 done
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &
 rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &
+roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
 
 
 
@@ -58,7 +59,6 @@ do
     python /simulation/inputs/controllers/test_3_Follow.py $(( i + one)) $i $FOLLOW_D_GAIN &> /dev/null &
     sleep 1
 done
-roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
 
 echo "Measures..."
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &

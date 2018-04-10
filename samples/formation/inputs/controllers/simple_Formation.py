@@ -293,7 +293,7 @@ class TestFormation:
 		print theta 		
 
 	    if self.command.data[3] == 5:
-		config = np.loadtxt('/simulation/AnnaCode/config0_0.txt')		
+		config = np.loadtxt('/simulation/config0_0.txt')		
 		self.status = Int8(self.command.data[3])
 		print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
 		status_pub.publish(self.status)

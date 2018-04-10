@@ -12,6 +12,8 @@ import tf
 import time
 import geodesy
 import numpy as np
+import pid
+
 
 from std_msgs.msg import Float64, Float64MultiArray, Int8
 from std_srvs.srv import Empty
@@ -26,21 +28,21 @@ from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Vect
 # UAV'S NUMBERED 0 -> NUM_UAV - 1
 # MAKE SURE this_uav feed follows this scheme in run_this.sh
 # /mavros topics follow 1 -> NUM_UAV
-#
-#
-# self Notes
-#	-random drones not initializing, cant consistently recreate issue 
-#	-commands get to velocity control and scramble
  
 class TestFormation: 
 		
+    #global isReadyToFly 
+    #global command
+    #global status
+    #global convergence 
+
     isReadyToFly = False
     command = Float64MultiArray()
     command.data = [0,0,0,-1]
     status = Int8()
     status.data = -1
     convergence = 0
-
+   
     def __init__(self, this_uav, NUM_UAV, D_GAIN):
 	
 	print 'init'	
@@ -48,8 +50,7 @@ class TestFormation:
 	print 'num uav = ' + str(NUM_UAV)
 	print 'dir_path = ' + str(os.path.dirname(os.path.realpath(__file__)))
 	print 'cwd = ' + str(os.getcwd())
-	#print 'ls -> ' + str(subprocess.check_output("ls /simulation/AnnaCode", shell = True))
-	#print 'make -> ' + str(subprocess.check_output("make /simulation/AnnaCode", shell=True))
+
     	global cur_pose 
 	global cur_state
 	global cur_vel
@@ -64,9 +65,15 @@ class TestFormation:
 	des_vel = TwistStamped()
 	des_vel.header.frame_id = "map"	
 
+	
 	t = 0 #time at start of rotation
-	ttR = 5 #time to rotate
+	ttR = 20  #time to rotate
 
+	comDisk = 0 #40 #size of communication disk between drones
+	
+	#create pid controllers for R and Theta (Kp, Ki, Kd)
+	cmdR = pid.PID(50,0,0)
+	cmdTheta = pid.PID(50,25,0)
 
         rospy.init_node('offboard_test'+str(this_uav), anonymous=True)
 	rate = rospy.Rate(100) #Hz
@@ -79,9 +86,6 @@ class TestFormation:
 	
 
 	print('paramPull - \n' + str(paramPull_proxy(True)))
-
-	#print('rospy_getParam-COM_ARM_EFK_AB\n'+ str(rospy.get_param('/mavros'+str(this_uav+1)+'/param/COM_ARM_EFK_AB')))
-
 	print('paramGet MAV_TYPE - \n' + str(paramGet_proxy("MAV_TYPE")))
 	print('______________________________________________________________________________')
 	
@@ -170,8 +174,13 @@ class TestFormation:
 		rate.sleep()
 
 	print 'num_connections = ' + str(nc)
+	print 'FLAG'
+	print rospy.is_shutdown()
 	sys.stdout.flush()
+	
 	rate.sleep()
+	print rospy.is_shutdown()
+
 
 	#MAIN LOOP
 	print 'Loop INIT Time  - ' + str(time.clock())
@@ -223,8 +232,8 @@ class TestFormation:
 		if time.clock() > t + ttR:	
 			self.status = Int8(self.command.data[3])
 			print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
-			print 'Current Pose - ' + str(cur_pose[this_uav].pose)
 			status_pub.publish(self.status)
+			ttR = 1000000000000 
 		
 
 		r = math.sqrt(math.pow(cur_pose[this_uav].pose.position.x,2) + math.pow(cur_pose[this_uav].pose.position.y,2))
@@ -232,7 +241,6 @@ class TestFormation:
 		theta = math.atan2(cur_pose[this_uav].pose.position.y, cur_pose[this_uav].pose.position.x) % (2*math.pi) #from [-pi,pi]	-> [0, 2pi]
 		theta_plus = math.atan2(cur_pose[plus_uav].pose.position.y, cur_pose[plus_uav].pose.position.x) % (2*math.pi)
 		theta_minus = math.atan2(cur_pose[minus_uav].pose.position.y, cur_pose[minus_uav].pose.position.x) % (2*math.pi) 
-		
 		
 
 		#deal with wrap around
@@ -245,49 +253,56 @@ class TestFormation:
 		else:	
 			dtheta_plus = theta - theta_plus
 		
-
-
-		#theta_des = ((theta_plus + theta_minus)/2)  #%(2*math.pi)	#abs pos of theta_des
-		#if abs((theta_des + 2*math.pi) - theta) < abs(theta_des - theta):
-		#	theta_des = (theta_des + 2*math.pi)
-		#elif abs((theta_des + math.pi) - theta) < abs(theta_des - theta):
-		#	theta_des = (theta_des + math.pi)
-		#else:
-		#	theta_des = ((theta_plus + theta_minus)/2)%(2*math.pi) 
-
-		#if math.fabs(theta_des - theta) > math.pi:
-		#	thetaDot = math.copysign(((2*math.pi) - math.fabs(theta_des - theta))/2, (theta_des - theta))
-		#	print 'theta = '+ str(theta) + ' theta_minus = '+str(theta_minus)+' theta_plus = '+str(theta_plus)+ ' theta_des = '+ str(theta_des) + ' thetaDot = ' + str(thetaDot) 
-		#else:
 		
 
-		thetaDot = (dtheta_minus - dtheta_plus) #even more backwards....
-		#print 'theta = '+ str(theta) + ' thetaDot = '+ str(thetaDot) + ' dtheta_plus = ' + str(dtheta_plus)+ ' dtheta_minus = ' + str(dtheta_minus)
-		
+		if comDisk: #do stuff
+			distPlus = math.sqrt(math.pow(cur_pose[this_uav].pose.position.x-cur_pose[plus_uav].pose.position.x,2)+math.pow(cur_pose[this_uav].pose.position.y-cur_pose[plus_uav].pose.position.y,2))
+			distMinus = math.sqrt(math.pow(cur_pose[this_uav].pose.position.x-cur_pose[minus_uav].pose.position.x,2)+math.pow(cur_pose[this_uav].pose.position.y-cur_pose[minus_uav].pose.position.y,2)) 
+			if distPlus > comDisk or distMinus > comDisk:
+				print 'comDisk'
+				print '     distPlus  - ' + str(distPlus) 
+				print '     distMinus - ' + str(distMinus) 
+			if distPlus > comDisk and distMinus > comDisk:
+				dtheta_plus = dtheta_minus = 2
+			elif distPlus > comDisk:
+				dtheta_plus  = 2
+				dtheta_minus = 0	
+			elif distMinus > comDisk:
+				dtheta_minus = 2
+				dtheta_plus  = 0
 
-		thetaDot =  thetaDot*10 + 2 
-		rDot = (self.command.data[2] - r) * 10
+		#thetaDot = (dtheta_minus - dtheta_plus) #even more backwards....		
+
+		#thetaDot =  thetaDot*15 + 2 
+		#rDot = (self.command.data[2] - r) * 18
 	
+		thetaError = (dtheta_minus - dtheta_plus)
+		rError = self.command.data[2] - r
+
+		thetaDot = cmdTheta.update(thetaError) + 5
+		rDot = cmdR.update(rError)
+		
+		if thetaDot < 0:
+			thetaDot = 0 		
+
 		des_vel.twist.linear.x = (rDot*math.cos(theta) - r*thetaDot*math.sin(theta)) * 2
 		des_vel.twist.linear.y = (rDot*math.sin(theta) + r*thetaDot*math.cos(theta)) * 2
 		des_vel.twist.linear.z = (25 - cur_pose[this_uav].pose.position.z) * .5 
 		vel_pub.publish(des_vel)
 
+		print theta 		
 
 	    if self.command.data[3] == 5:
 		config = np.loadtxt('/simulation/AnnaCode/config0_0.txt')		
-            	#print config[0, this_uav]
 		self.status = Int8(self.command.data[3])
 		print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
-		print 'Current Pose - ' + str(cur_pose[this_uav].pose)
-
 		status_pub.publish(self.status)
 
 	    if self.command.data[3] > 5:
 
             	des_pose.pose.position.x = config[ int(self.command.data[3] - 6), (4*this_uav)]
             	des_pose.pose.position.y = config[ int(self.command.data[3] - 6), (4*this_uav) + 1 ]
-	    	des_pose.pose.position.z = 25
+	    	des_pose.pose.position.z = 20 + (2*this_uav)
 		
 		self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
 		    

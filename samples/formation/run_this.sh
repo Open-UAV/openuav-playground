@@ -51,6 +51,8 @@ done
 sleep 1
 echo "Launch Sequencer" #>> /tmp/debug
 python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &
+ 
+
 
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
 roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &

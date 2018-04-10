@@ -62,11 +62,7 @@ roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
 
 echo "Measures..."
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &
-
-
-rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &
-tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
-roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &
+roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera_front/image_raw debug_view:=false &> /dev/null &
 
 for((i=1;i<=$num_uavs;i+=1))
 do

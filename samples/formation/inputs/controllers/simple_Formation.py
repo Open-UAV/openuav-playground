@@ -28,6 +28,12 @@ from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Vect
 # UAV'S NUMBERED 0 -> NUM_UAV - 1
 # MAKE SURE this_uav feed follows this scheme in run_this.sh
 # /mavros topics follow 1 -> NUM_UAV
+
+'''
+NOTE - To run annas code, precalculate for 5 drones and put config0_0.txt into formation/ 
+     - To run without annas code (will stay in rotation) set if condition at line 95 in sequencer.py from {pass -> continue}
+'''
+
  
 class TestFormation: 
 		

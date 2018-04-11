@@ -289,7 +289,7 @@ def debugStmts(request):
 		debugStatements = string.replace(debugStatements, '\r\n', '<br />')
 		debugStatements = string.replace(debugStatements, '\n', '<br />')
 	except Exception as e:
-		debugStatements = ''
+		print(e)
 
 	return HttpResponse(debugStatements)
 

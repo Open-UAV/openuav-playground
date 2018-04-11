@@ -16,7 +16,8 @@ rm -f /root/src/Firmware/posix-configs/SITL/init/lpe/f450-tmp-*
 rm -f /root/src/Firmware/launch/posix_sitl_multi_tmp.launch
 
 #chmod -R 777 /root/src && chmod -R 777 /root/catkin_ws
-
+echo "source /root/catkin_ws/devel/setup.bash" >> /home/.profile
+ 
 #####################
 #####################
 ## Run user script ##

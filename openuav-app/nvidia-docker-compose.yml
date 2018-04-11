@@ -15,7 +15,7 @@ services:
     - /dev/nvidia-uvm
     - /dev/nvidia-uvm-tools
     volumes:
-    - nvidia_driver_384.111:/usr/local/nvidia:ro
+    - nvidia_driver_390.30:/usr/local/nvidia:ro
   openuav:
     build: dockerfiles/openuav_sample/
     devices:
@@ -35,7 +35,7 @@ services:
     volumes:
     - ../samples/testSimulation:/simulation
     - /tmp/.X11-unix:/tmp/.X11-unix
-    - nvidia_driver_384.111:/usr/local/nvidia:ro
+    - nvidia_driver_390.30:/usr/local/nvidia:ro
   web:
     build: dockerfiles/django/
     command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py
@@ -53,8 +53,8 @@ services:
     restart: always
     volumes:
     - .:/code
-    - nvidia_driver_384.111:/usr/local/nvidia:ro
+    - nvidia_driver_390.30:/usr/local/nvidia:ro
 version: '2'
 volumes:
-  nvidia_driver_384.111:
+  nvidia_driver_390.30:
     external: true

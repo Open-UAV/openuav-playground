@@ -84,7 +84,8 @@
                 error: function (response) {
                     $('#ajax-populate').html('<a>There is some error with the simulation or network.</a>');
                     $('#spinner').hide();
-                }           
+                },          
+                timeout: 300000 // sets timeout to 300 seconds      
             });
 
             function printDebugStatements() {

@@ -140,11 +140,11 @@
         </camera>
         <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
           <alwaysOn>true</alwaysOn>
-          <imageTopicName>image_raw_front</imageTopicName>
+          <imageTopicName>image_raw</imageTopicName>
           <cameraInfoTopicName>camera_info</cameraInfoTopicName>
           <updateRate>10.0</updateRate>
-          <cameraName>uav_camera</cameraName>
-          <frameName>f450/robot_camera</frameName>
+          <cameraName>uav_camera_front</cameraName>
+          <frameName>f450/robot_camera_front</frameName>
           <CxPrime>320.5</CxPrime>
           <Cx>320.5</Cx>
           <Cy>240.5</Cy>
@@ -204,10 +204,10 @@
         </camera>
         <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
           <alwaysOn>true</alwaysOn>
-          <imageTopicName>image_raw_down</imageTopicName>
+          <imageTopicName>image_raw</imageTopicName>
           <cameraInfoTopicName>camera_info</cameraInfoTopicName>
           <updateRate>10.0</updateRate>
-          <cameraName>uav_camera</cameraName>
+          <cameraName>uav_camera_down</cameraName>
           <frameName>f450/robot_camera_down</frameName>
           <CxPrime>320.5</CxPrime>
           <Cx>320.5</Cx>

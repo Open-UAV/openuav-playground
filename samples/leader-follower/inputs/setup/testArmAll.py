@@ -8,7 +8,11 @@ from mavros_msgs.srv import CommandBool, CommandTOL, SetMode
 from geometry_msgs.msg import PoseStamped,Pose,Vector3,Twist,TwistStamped
 from std_srvs.srv import Empty
 import time 
+
+print 'init'
+
 cur_pose = PoseStamped()
+
 def pos_cb(msg):
     global cur_pose
     cur_pose = msg
@@ -19,6 +23,7 @@ mode_proxy = [None for i in range(NUM_UAV)]
 arm_proxy = [None for i in range(NUM_UAV)]
 
 def mavrosTopicStringRoot(uavID=0):
+    print 'mavros' + str(uavID+1)
     return ('mavros' + str(uavID+1))
 
 rospy.init_node('multi', anonymous=True)

@@ -55,7 +55,7 @@ python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outp
 
 
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &
-roslaunch opencv_apps general_contours.launch  image:=/uav_2_camera/image_raw_front debug_view:=false &> /dev/null &
+roslaunch opencv_apps general_contours.launch  image:=/uav_1_camera_front/image_raw debug_view:=false &> /dev/null &
 
 echo "Measures..." #>> /tmp/debug
 for((i=1;i<=$num_uavs;i+=1))

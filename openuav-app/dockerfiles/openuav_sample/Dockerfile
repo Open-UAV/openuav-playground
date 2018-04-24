@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-
+RUN pip install --upgrade pip
 RUN mkdir ros-setups
 COPY ros-setups ros-setups/
 RUN ros-setups/ubuntu-16/setup-ros.sh 
@@ -112,13 +112,13 @@ RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.profile && \
     echo "export GAZEBO_MODEL_PATH=:/root/src/Firmware/Tools/sitl_gazebo/models" >> ~/.profile && \
     echo "export GAZEBO_RESOURCE_PATH=:/root/src/Firmware/Tools/sitl_gazebo/media" >> ~/.profile && \
     echo "export PYTHONPATH=/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/jade/lib/python2.7/dist-packages" >> ~/.profile
-
+RUN echo "installing ROS image packages"
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-web-video-server \
         ros-kinetic-image-geometry \
         ros-kinetic-image-transport-plugins \
         ros-kinetic-image-proc 
-RUN apt-get install -y ros-kinetic-rosbridge-server ros-kinetic-opencv-apps
+RUN apt-get install -y ros-kinetic-rosbridge-server ros-kinetic-opencv-apps ros-kinetic-tf2-geometry-msgs
 
 RUN cd ~/catkin_ws/src && \
     git clone https://github.com/RIVeR-Lab/apriltags_ros.git
@@ -134,6 +134,9 @@ RUN sed -i '/force_color_prompt/s/^#//g' ~/.bashrc
 
 # for mavros global position in GPS to UTM conversions 
 RUN apt-get -y install ros-kinetic-geodesy
+RUN pip install dronekit 
+RUN pip install cherrypy
+RUN pip install dronekit_sitl
 
 ### Django set up to expose various states from the simulation container
 RUN apt-get -y install python3-pip
@@ -149,6 +152,7 @@ RUN sed -i '/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['\''*'\'']' /django/DjangoProject/
 
 # Wetty - web tty
 RUN mkdir /wetty
+RUN npm config set strict-ssl false
 RUN npm explore npm -g -- npm install node-gyp@latest
 RUN cd /wetty && git clone https://github.com/krishnasrinivas/wetty && \
     cd wetty && npm install

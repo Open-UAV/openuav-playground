@@ -10,16 +10,20 @@ services:
     build: dockerfiles/postgres/
     devices:
     - /dev/nvidia0
+    - /dev/nvidia1
     - /dev/nvidiactl
     - /dev/nvidia-uvm
+    - /dev/nvidia-uvm-tools
     volumes:
     - nvidia_driver_390.30:/usr/local/nvidia:ro
   openuav:
     build: dockerfiles/openuav_sample/
     devices:
     - /dev/nvidia0
+    - /dev/nvidia1
     - /dev/nvidiactl
     - /dev/nvidia-uvm
+    - /dev/nvidia-uvm-tools
     entrypoint: /home/setup.sh
     environment:
     - DISPLAY=$DISPLAY
@@ -40,8 +44,10 @@ services:
     - db
     devices:
     - /dev/nvidia0
+    - /dev/nvidia1
     - /dev/nvidiactl
     - /dev/nvidia-uvm
+    - /dev/nvidia-uvm-tools
     ports:
     - 8001:80
     restart: always

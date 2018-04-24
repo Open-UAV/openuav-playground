@@ -63,7 +63,7 @@ class TestLoop:
                 curr_y = self.curr_pose.pose.position.y
                 curr_z = self.curr_pose.pose.position.z
 
-                azimuth = math.atan2(0-curr_y, 20-curr_x)
+                azimuth = math.atan2(des_y-curr_y, des_x-curr_x)
                 quaternion = tf.transformations.quaternion_from_euler(0, 0, azimuth)
                 print quaternion
                 self.des_pose.pose.orientation.x = quaternion[0]

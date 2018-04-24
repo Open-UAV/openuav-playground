@@ -18,9 +18,9 @@ cp /simulation/inputs/models/f450-1/f450-1.sdf /root/src/Firmware/Tools/sitl_gaz
 cp /simulation/inputs/setup/posix_sitl_openuav_swarm_base.launch /root/src/Firmware/launch/posix_sitl_openuav_swarm_base.launch
 
 
+mkdir /simulation/outputs 
 rm -f /simulation/outputs/*.csv
-rm -f /simulation/outputs/*.txt
-echo "Setup..." #>> /tmp/debug
+echo "Setup..." >> /tmp/debug
 
 
 python /simulation/inputs/setup/gen_gazebo_ros_spawn.py $num_uavs 

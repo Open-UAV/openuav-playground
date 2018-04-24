@@ -42,7 +42,7 @@ echo "px4 posix_sitl_multi_gazebo_ros$num_uavs.launch"
     echo "launched uav$i ..." >> /tmp/debug
 done
 
-python /simulation/inputs/controllers/dostuff.py $num_uavs 1 &> /dev/null &
+python /simulation/inputs/controllers/dostuff.py $num_uavs 1 "127.0.0.1:14740" &> /dev/null &
 
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &
 rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &

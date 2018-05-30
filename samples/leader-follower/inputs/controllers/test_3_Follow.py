@@ -35,6 +35,7 @@ class TestFollow:
         rate = rospy.Rate(100)  # Hz
         rate.sleep()
         self.des_pose = self.copy_pose(self.curr_pose)
+
         while not rospy.is_shutdown():
             if self.isReadyToFly:
                 self.des_pose.pose.position.x = self.leader_pose.pose.position.x + (self.leader_vel.twist.linear.x*D_GAIN)

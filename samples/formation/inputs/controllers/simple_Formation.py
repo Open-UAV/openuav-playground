@@ -36,18 +36,6 @@ NOTE - To run annas code, precalculate for 5 drones and put config0_0.txt into f
 
  
 class TestFormation: 
-		
-    #global isReadyToFly 
-    #global command
-    #global status
-    #global convergence 
-
-    isReadyToFly = False
-    command = Float64MultiArray()
-    command.data = [0,0,0,-1]
-    status = Int8()
-    status.data = -1
-    convergence = 0
    
     def __init__(self, this_uav, NUM_UAV, D_GAIN):
 	
@@ -61,16 +49,23 @@ class TestFormation:
 	global cur_state
 	global cur_vel
 	global cur_globalPose	
+	global command	
 
 	cur_pose = [PoseStamped() for i in range(NUM_UAV)]
 	cur_globalPose = [NavSatFix() for i in range(NUM_UAV)]
     	cur_state = [State() for i in range(NUM_UAV)]
     	cur_vel =  [TwistStamped() for i in range(NUM_UAV)]
   
+	command = Float64MultiArray()
+	command.data = [0,0,0,-1]
+
 	des_pose = PoseStamped() 	
 	des_vel = TwistStamped()
 	des_vel.header.frame_id = "map"	
 
+	status = Int8()
+	status.data = -1
+	convergence = 0
 	
 	t = 0 #time at start of rotation
 	ttR = 20  #time to rotate
@@ -128,7 +123,7 @@ class TestFormation:
 	des_pose.pose.position.y = 10 * math.cos((this_uav * 2 * math.pi) / NUM_UAV)
 	des_pose.pose.position.z = 20
 	pose_pub.publish(des_pose)
-	status_pub.publish(self.status)
+	status_pub.publish(status)
 
 	#....fix....double subscribe to status, check and set status in callback?
         print cur_state[this_uav]
@@ -192,9 +187,9 @@ class TestFormation:
 	print 'Loop INIT Time  - ' + str(time.clock())
         while not rospy.is_shutdown():
 
-		#hopefully temporary hack
+	    #'''	#hopefully temporary hack
 	    while cur_state[this_uav].mode != 'OFFBOARD' and not cur_state[this_uav].armed:
-		    print 'rearming'
+		    print '------------------rearming----------------------------'
 	 	    mode_sent = False
 		    success = False
 		    pose_pub.publish(des_pose)		
@@ -211,34 +206,34 @@ class TestFormation:
 			except rospy.ServiceException as exc:
 				print exc
 		#temp end
+	    #'''
+	    if command.data[3] > -1 and command.data[3] < 4:
 
-	    if self.command.data[3] > -1 and self.command.data[3] < 4:
-
-            	des_pose.pose.position.x = self.command.data[0] + self.command.data[2]*math.sin((this_uav * 2 * math.pi)/NUM_UAV)
-            	des_pose.pose.position.y = self.command.data[1] + self.command.data[2]*math.cos((this_uav * 2 * math.pi)/NUM_UAV)
+            	des_pose.pose.position.x = command.data[0] + command.data[2]*math.sin((this_uav * 2 * math.pi)/NUM_UAV)
+            	des_pose.pose.position.y = command.data[1] + command.data[2]*math.cos((this_uav * 2 * math.pi)/NUM_UAV)
 	    	des_pose.pose.position.z = 25
 		
-		self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
+		convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
 		    
-		if self.convergence < .5 and self.status != Int8(self.command.data[3]):
+		if convergence < .5 and status != Int8(command.data[3]):
 
-		    self.status = Int8(self.command.data[3])
-		    print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
+		    status = Int8(command.data[3])
+		    print 'Status Set - '+ str(status) + '  time - '+ str(time.clock())
 		    print 'Current Pose - ' + str(cur_pose[this_uav].pose)
-		    status_pub.publish(self.status)
+		    status_pub.publish(status)
 
 		pose_pub.publish(des_pose)
 	    
-	    if self.command.data[3] == 4:
+	    if command.data[3] == 4:
 		
 		#timing on rotation
 		if t == 0:
 			t = time.clock()
 			print t
 		if time.clock() > t + ttR:	
-			self.status = Int8(self.command.data[3])
-			print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
-			status_pub.publish(self.status)
+			status = Int8(command.data[3])
+			print 'Status Set - '+ str(status) + '  time - '+ str(time.clock())
+			status_pub.publish(status)
 			ttR = 1000000000000 
 		
 
@@ -274,16 +269,11 @@ class TestFormation:
 				dtheta_plus  = 2
 				dtheta_minus = 0	
 			elif distMinus > comDisk:
-				dtheta_minus = 2
-				dtheta_plus  = 0
-
-		#thetaDot = (dtheta_minus - dtheta_plus) #even more backwards....		
-
-		#thetaDot =  thetaDot*15 + 2 
-		#rDot = (self.command.data[2] - r) * 18
+				dtheta_minus = 0
+				dtheta_plus  = .5
 	
 		thetaError = (dtheta_minus - dtheta_plus)
-		rError = self.command.data[2] - r
+		rError = command.data[2] - r
 
 		thetaDot = cmdTheta.update(thetaError) + 5
 		rDot = cmdR.update(rError)
@@ -298,27 +288,27 @@ class TestFormation:
 
 		print theta 		
 
-	    if self.command.data[3] == 5:
+	    if command.data[3] == 5:
 		config = np.loadtxt('/simulation/config0_0.txt')		
-		self.status = Int8(self.command.data[3])
-		print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
-		status_pub.publish(self.status)
+		status = Int8(command.data[3])
+		print 'Status Set - '+ str(status) + '  time - '+ str(time.clock())
+		status_pub.publish(status)
 
-	    if self.command.data[3] > 5:
+	    if command.data[3] > 5:
 
-            	des_pose.pose.position.x = config[ int(self.command.data[3] - 6), (4*this_uav)]
-            	des_pose.pose.position.y = config[ int(self.command.data[3] - 6), (4*this_uav) + 1 ]
+            	des_pose.pose.position.x = config[ int(command.data[3] - 6), (4*this_uav)]
+            	des_pose.pose.position.y = config[ int(command.data[3] - 6), (4*this_uav) + 1 ]
 	    	des_pose.pose.position.z = 20 + (2*this_uav)
 		
-		self.convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
+		convergence =  math.sqrt(math.pow(des_pose.pose.position.x-cur_pose[this_uav].pose.position.x,2)+math.pow(des_pose.pose.position.y-cur_pose[this_uav].pose.position.y,2)+math.pow(des_pose.pose.position.z-cur_pose[this_uav].pose.position.z,2))
 		    
-		if self.convergence < .5 and self.status != Int8(self.command.data[3]):
+		if convergence < .5 and status != Int8(command.data[3]):
 
-		    self.status = Int8(self.command.data[3])
-		    print 'Status Set - '+ str(self.status) + '  time - '+ str(time.clock())
+		    status = Int8(command.data[3])
+		    print 'Status Set - '+ str(status) + '  time - '+ str(time.clock())
 		    print 'Current Pose - ' + str(cur_pose[this_uav].pose)
-		    print 'Cmd Pose - (' + str(config[ int(self.command.data[3] - 6), (4*this_uav) ]) + ',' + str(config[ int(self.command.data[3] - 6) ,(4*this_uav) + 1 ]) + ')'
-		    status_pub.publish(self.status)
+		    print 'Cmd Pose - (' + str(config[ int(command.data[3] - 6), (4*this_uav) ]) + ',' + str(config[ int(command.data[3] - 6) ,(4*this_uav) + 1 ]) + ')'
+		    status_pub.publish(status)
 		pose_pub.publish(des_pose)
 
 
@@ -343,7 +333,8 @@ class TestFormation:
 	self.curr_state = msg
 
     def command_cb(self, msg):
-	self.command = msg
+	global command
+	command = msg
 	print 'COMMAND callback ----- ' + str(msg)
 	print 'COMMAND CALLBACK TIME  - '+ str(time.clock())
 	sys.stdout.flush()

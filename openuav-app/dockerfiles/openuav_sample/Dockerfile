@@ -170,6 +170,6 @@ RUN sed -i 's/LOGIN_TIMEOUT\t\t60/LOGIN_TIMEOUT\t\t7000/g' /etc/login.defs
 ADD setup.sh /home/
 RUN chmod +x /home/setup.sh
 RUN mkdir /home/term
-ADD .profile /home/term/
-ADD .profile /home/
+RUN cp ~/.profile /home/term/
+RUN cp ~/.profile /home/
 

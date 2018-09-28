@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 RUN apt-get install -y vim
 RUN apt-get install -y dnsutils
 RUN apt-get install -y postgresql-client-common 
-RUN apt-get install -y postgresql-client-9.4
+RUN apt-get install -y postgresql-client-9.6
 
 # Not verified
 RUN django-admin.py startproject openuav .

@@ -286,8 +286,8 @@ def debugStmts(request):
 
 		results = urllib.request.urlopen('http://' + simulation_ip + ':' + SIM_CONTAINER_PORT + '/query/debugStmts').read()
 		debugStatements = str(results.decode('UTF-8'))
-		debugStatements = string.replace(debugStatements, '\r\n', '<br />')
-		debugStatements = string.replace(debugStatements, '\n', '<br />')
+		debugStatements = debugStatements.replace('\r\n', '<br />')
+		debugStatements = debugStatements.replace('\n', '<br />')
 	except Exception as e:
 		print(e)
 

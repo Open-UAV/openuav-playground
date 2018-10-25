@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import urllib.request
 import time
-import string
 import subprocess
 from django.views.decorators.csrf import csrf_exempt
 from sim.exceptions import *

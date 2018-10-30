@@ -1,0 +1,305 @@
+INIT
+
+num_connections = 4
+publishing - 
+layout: 
+  dim: 
+    - 
+      label: "command"
+      size: 4
+      stride: 32
+  data_offset: 0
+data: [0, 0, 10, 0]
+published  - [0, 0, 10, 1]
+published  - [0, 0, 40, 2]
+published  - [0, 0, 30, 3]
+published  - [0, 0, 30, 4]
+4
+False
+4
+False
+4
+False
+4
+False
+4
+True
+running wrapper
+2
+(25, 20)
+published - [0, 0, 0, 5]
+5
+False
+5
+False
+5
+False
+5
+False
+5
+True
+published - [0, 0, 0, 6]
+6
+False
+6
+False
+6
+False
+6
+False
+6
+True
+published - [0, 0, 0, 7]
+7
+False
+7
+False
+7
+False
+7
+False
+7
+True
+published - [0, 0, 0, 8]
+8
+False
+8
+False
+8
+False
+8
+False
+8
+True
+published - [0, 0, 0, 9]
+9
+False
+9
+False
+9
+False
+9
+False
+9
+True
+published - [0, 0, 0, 10]
+10
+False
+10
+False
+10
+False
+10
+False
+10
+True
+published - [0, 0, 0, 11]
+11
+False
+11
+False
+11
+False
+11
+False
+11
+True
+published - [0, 0, 0, 12]
+12
+False
+12
+False
+12
+False
+12
+False
+12
+True
+published - [0, 0, 0, 13]
+13
+False
+13
+False
+13
+False
+13
+False
+13
+True
+published - [0, 0, 0, 14]
+14
+False
+14
+False
+14
+False
+14
+False
+14
+True
+published - [0, 0, 0, 15]
+15
+False
+15
+False
+15
+False
+15
+False
+15
+True
+published - [0, 0, 0, 16]
+16
+False
+16
+False
+16
+False
+16
+False
+16
+True
+published - [0, 0, 0, 17]
+17
+False
+17
+False
+17
+False
+17
+False
+17
+True
+published - [0, 0, 0, 18]
+18
+False
+18
+False
+18
+False
+18
+False
+18
+True
+published - [0, 0, 0, 19]
+19
+False
+19
+False
+19
+False
+19
+False
+19
+True
+published - [0, 0, 0, 20]
+20
+False
+20
+False
+20
+False
+20
+False
+20
+True
+published - [0, 0, 0, 21]
+21
+False
+21
+False
+21
+False
+21
+False
+21
+True
+published - [0, 0, 0, 22]
+22
+False
+22
+False
+22
+False
+22
+False
+22
+True
+published - [0, 0, 0, 23]
+23
+False
+23
+False
+23
+False
+23
+False
+23
+True
+published - [0, 0, 0, 24]
+24
+False
+24
+False
+24
+False
+24
+False
+24
+True
+published - [0, 0, 0, 25]
+25
+False
+25
+False
+25
+False
+25
+False
+25
+True
+published - [0, 0, 0, 26]
+26
+False
+26
+False
+26
+False
+26
+False
+26
+True
+published - [0, 0, 0, 27]
+27
+False
+27
+False
+27
+False
+27
+False
+27
+True
+published - [0, 0, 0, 28]
+28
+False
+28
+False
+28
+False
+28
+False
+28
+True
+published - [0, 0, 0, 29]
+29
+False
+29
+False
+29
+False
+29
+False
+29
+True
+published - [0, 0, 0, 30]

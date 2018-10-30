@@ -36,6 +36,14 @@ RUN ros-setups/ubuntu-16/setup-install.sh
 RUN ros-setups/ubuntu-16/setup-gym-gzweb-uavnav.sh
 #RUN git clone https://github.com/schmittlema/ros-setups.git && cd ros-setups/ubuntu-16 && ./setup-ros.sh && ./setup-mavlink-mavros.sh && ./setup-install.sh && ./setup-gym-gzweb-uavnav.sh
 
+#Turtlebot modules hack 
+RUN mkdir /lib/modules
+COPY lib/. /lib/modules
+RUN ls /lib/modules
+RUN apt-get update && apt-get install -y ros-kinetic-turtlebot \
+	ros-kinetic-turtlebot-simulator \ 
+	ros-kinetic-turtlebot-apps
+
 RUN pip --no-cache-dir install \
          --upgrade pip \
          --upgrade virtualenv

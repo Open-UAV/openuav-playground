@@ -169,4 +169,4 @@ RUN chmod +x /home/setup.sh
 RUN mkdir /home/term
 RUN cp ~/.profile /home/term/
 RUN cp ~/.profile /home/
-
+RUN pip uninstall -y tornado

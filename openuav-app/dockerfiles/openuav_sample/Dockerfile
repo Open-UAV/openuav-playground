@@ -126,8 +126,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-image-geometry \
         ros-kinetic-image-transport-plugins \
         ros-kinetic-image-proc 
-RUN apt-get install -y ros-kinetic-rosbridge-server ros-kinetic-opencv-apps ros-kinetic-tf2-geometry-msgs
-
+RUN apt-get install -y ros-kinetic-rosbridge* ros-kinetic-opencv-apps ros-kinetic-tf2-geometry-msgs
+RUN pip uninstall -y tornado
 RUN cd ~/catkin_ws/src && \
     git clone https://github.com/RIVeR-Lab/apriltags_ros.git
 RUN cd ~/catkin_ws && \
@@ -142,9 +142,6 @@ RUN sed -i '/force_color_prompt/s/^#//g' ~/.bashrc
 
 # for mavros global position in GPS to UTM conversions 
 RUN apt-get -y install ros-kinetic-geodesy
-RUN pip install dronekit 
-RUN pip install cherrypy
-RUN pip install dronekit_sitl
 
 ### Django set up to expose various states from the simulation container
 RUN apt-get -y install python3-pip

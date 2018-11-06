@@ -6,7 +6,17 @@ networks:
         subnet: 172.28.0.0/16
       driver: default
 services:
-  openuav_turtlebot:
+  db:
+    build: dockerfiles/postgres/
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidia1
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    - /dev/nvidia-uvm-tools
+    volumes:
+    - nvidia_driver_390.30:/usr/local/nvidia:ro
+  openuav:
     build: dockerfiles/openuav_sample/
     devices:
     - /dev/nvidia0
@@ -25,6 +35,24 @@ services:
     volumes:
     - ../samples/testSimulation:/simulation
     - /tmp/.X11-unix:/tmp/.X11-unix
+    - nvidia_driver_390.30:/usr/local/nvidia:ro
+  web:
+    build: dockerfiles/django/
+    command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py
+      makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:80"
+    depends_on:
+    - db
+    devices:
+    - /dev/nvidia0
+    - /dev/nvidia1
+    - /dev/nvidiactl
+    - /dev/nvidia-uvm
+    - /dev/nvidia-uvm-tools
+    ports:
+    - 8001:80
+    restart: always
+    volumes:
+    - .:/code
     - nvidia_driver_390.30:/usr/local/nvidia:ro
 version: '2'
 volumes:

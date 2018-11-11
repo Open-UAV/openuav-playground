@@ -1,3 +1,4 @@
-Django==2.1.2
+Django
 gunicorn==19.7.1
-psycopg2	
+psycopg2
+uwsgi	

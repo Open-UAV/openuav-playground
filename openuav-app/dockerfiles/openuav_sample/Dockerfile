@@ -2,11 +2,10 @@ FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
 MAINTAINER Jnaneshwar Das <jnaneshwar.das@gmail.com> / Matt Schmittle <schmttle@udel.edu> / Abhijeet Singh <abhsingh@seas.upenn.edu>
 
-RUN apt-get update && apt-get install -y apt-utils \
-        git
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
+        apt-utils \
+        git \
+	build-essential \
         curl \
         geographiclib-tools \
         libcurl3-dev \
@@ -127,7 +126,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-image-transport-plugins \
         ros-kinetic-image-proc 
 RUN apt-get install -y ros-kinetic-rosbridge* ros-kinetic-opencv-apps ros-kinetic-tf2-geometry-msgs
-RUN pip uninstall -y tornado
 RUN cd ~/catkin_ws/src && \
     git clone https://github.com/RIVeR-Lab/apriltags_ros.git
 RUN cd ~/catkin_ws && \
@@ -156,17 +154,17 @@ RUN sed -i '/ALLOWED_HOSTS/c\ALLOWED_HOSTS = ['\''*'\'']' /django/DjangoProject/
 ### Django set up to expose various states from the simulation container
 
 # Wetty - web tty
-RUN mkdir /wetty
-RUN npm install wetty
+#RUN mkdir /wetty
+#RUN npm install wetty
 
 # Adding user term and giving permissions
-RUN useradd -d /simulation -m -s /bin/bash term
-RUN echo 'term:term' | chpasswd
-RUN chmod -R 777 /root/src && chmod -R 777 /root/catkin_ws && \
-    chmod -R 777 /simulation && \
-    chmod -R 777 /opt/ros
-RUN find /root -type d -exec chmod 755 {} \;
-RUN sed -i 's/LOGIN_TIMEOUT\t\t60/LOGIN_TIMEOUT\t\t7000/g' /etc/login.defs
+#RUN useradd -d /simulation -m -s /bin/bash term
+#RUN echo 'term:term' | chpasswd
+#RUN chmod -R 777 /root/src && chmod -R 777 /root/catkin_ws && \
+#    chmod -R 777 /simulation && \
+#    chmod -R 777 /opt/ros
+#RUN find /root -type d -exec chmod 755 {} \;
+#RUN sed -i 's/LOGIN_TIMEOUT\t\t60/LOGIN_TIMEOUT\t\t7000/g' /etc/login.defs
 
 # Ensure the setup.sh is in the last, so that we can build again quickly if setup changes
 ADD setup.sh /home/

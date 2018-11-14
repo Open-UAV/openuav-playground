@@ -72,21 +72,28 @@
             console.log( "ready!" );
             $('#spinner').show();
             var console2loaded = false;
-            $.ajax({
-                type: "POST",
-                url: "/sim/console2/?user={{userid}}",                
-                success: function(data){     
-                    console2loaded = true;        
-                    $('#ajax-populate').html(data);
-                    $('#spinner').hide();
-                    $('#debugStatements').hide();
-                },
-                error: function (response) {
-                    $('#ajax-populate').html('<a>There is some error with the simulation or network.</a>');
-                    $('#spinner').hide();
-                },          
-                timeout: 300000 // sets timeout to 300 seconds      
-            });
+
+            function console2() {
+               $.ajax({
+                       type: "POST",
+                       url: "/sim/console2/?user={{userid}}",
+                       success: function(data){
+                               console2loaded = true;
+                               $('#ajax-populate').html(data);
+                               $('#spinner').hide();
+                               $('#debugStatements').hide();
+                       },
+                       error: function (response) {
+                                if(!console2loaded){
+                                    setTimeout(console2, 300);
+                                    setTimeout(printDebugStatements, 300);
+
+                                }
+                       },
+                       timeout: 300000 // sets timeout to 300 seconds
+               });
+            }
+
 
             function printDebugStatements() {
                 $.ajax({
@@ -106,6 +113,7 @@
 
             // call printDebugStatements once - it will recurse itself if needed
             printDebugStatements();
+            console2();
         });
     </script>
 

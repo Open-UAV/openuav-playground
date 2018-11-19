@@ -47,7 +47,6 @@ rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/
 roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
 
 
-
 python /simulation/inputs/controllers/test_1_Loop.py $LOOP_EDGE $ALTITUDE 1 0 &> /dev/null &
 python /simulation/inputs/setup/testArmAll.py $num_uavs &> /dev/null &
 

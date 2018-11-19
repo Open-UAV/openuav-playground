@@ -43,27 +43,38 @@ done
 
 for ((i=1;i<=$num_ground;i+=1))
 do
-    export ROBOT_INITIAL_POSE="-x $i -y 5"
+    export ROBOT_INITIAL_POSE="-x 3 -y $(($i * 3))"
     echo "launching turtlebot$i at $ROBOT_INITIAL_POSE"
     roslaunch /simulation/inputs/setup/test_kobuki.launch namespace:=turtlebot$i &
     sleep 5
 done
 
 
-
-
 python /simulation/inputs/measures/measureInterRobotDistance.py $num_uavs 1 &> /dev/null &
 roslaunch rosbridge_server rosbridge_websocket.launch ssl:=false &> /dev/null &
 rosrun web_video_server web_video_server _port:=80 _server_threads:=100 &> /dev/null &
 
+sleep 5
+
+
 for((i = 0;i<$num_uavs;i+=1))
 do
-    python /simulation/inputs/controllers/simple_Formation.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
+    python /simulation/inputs/controllers/uavFollow.py $i $i $FOLLOW_D_GAIN &> /simulation/outputs/patroLog$i.txt &
 done
 sleep 1
-echo "Launch Sequencer" #>> /tmp/debug
-python /simulation/inputs/controllers/sequencer.py $num_uavs &> /simulation/outputs/sequencerLog.txt &
+
+python /simulation/inputs/controllers/turtlebotLoop.py 0 1 1 &> /simulation/outputs/turtleLog$i.txt &
+
+'''
+for((i = 0;i<$num_ground;i+=1))
+do
+    python /simulation/inputs/controllers/turtlebotLoop.py $i $num_uavs $FOLLOW_D_GAIN &> /simulation/outputs/turtleLog$i.txt &
+done
+sleep 1
+'''
+echo "Scripts Launched" #>> /tmp/debug
  
+python /simulation/inputs/setup/testArmAll.py $num_uavs &> /dev/null &
 
 
 tensorboard --logdir=/simulation/outputs/ --port=8008 &> /dev/null &

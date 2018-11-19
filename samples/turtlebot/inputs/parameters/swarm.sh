@@ -1,6 +1,6 @@
 #!/bin/bash
 source /root/.bashrc
-num_uavs=4
+num_uavs=2
 num_ground=2
 duration_seconds=3000
 FOLLOW_D_GAIN=1

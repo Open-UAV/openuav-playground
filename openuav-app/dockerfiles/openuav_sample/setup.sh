@@ -3,7 +3,7 @@
 #Django start server
 python3 /django/manage.py makemigrations &> /dev/null
 python3 /django/manage.py migrate &> /dev/null
-python3 /django/manage.py runserver 0.0.0.0:31819 &> /dev/null &
+cd /django/ && /usr/bin/uwsgi_python35 --http-socket :31819 -T -p 4 --module DjangoProject.wsgi  &> /tmp/a &
 #Django start server
 
 #cd /wetty/wetty

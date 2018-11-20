@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
         openjdk-8-jdk \
         openjdk-8-jre-headless \
+        uwsgi \
+        uwsgi-src \
+        uwsgi-plugin-python3 \
         python-pip \
         && \
     apt-get clean && \

@@ -6,7 +6,7 @@ services:
   web:
     restart: always
     build: dockerfiles/django/
-    command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py makemigrations && python manage.py migrate && uwsgi --http :80 --module openuav.wsgi"
+    command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py makemigrations && python manage.py migrate && uwsgi --http-socket :80 -T -p 5 --module openuav.wsgi"
     # command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:80"
     volumes:
       - .:/code

@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
         openjdk-8-jdk \
         openjdk-8-jre-headless \
+        uwsgi \
+        uwsgi-src \
+        uwsgi-plugin-python3 \
         python-pip \
         && \
     apt-get clean && \
@@ -39,9 +42,6 @@ RUN ros-setups/ubuntu-16/setup-gym-gzweb-uavnav.sh
 RUN mkdir /lib/modules
 COPY lib/. /lib/modules
 RUN ls /lib/modules
-RUN apt-get update && apt-get install -y ros-kinetic-turtlebot \
-	ros-kinetic-turtlebot-simulator \ 
-	ros-kinetic-turtlebot-apps
 
 RUN pip --no-cache-dir install \
          --upgrade pip \
@@ -126,6 +126,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-image-transport-plugins \
         ros-kinetic-image-proc 
 RUN apt-get install -y ros-kinetic-rosbridge* ros-kinetic-opencv-apps ros-kinetic-tf2-geometry-msgs
+RUN apt-get update && apt-get install -y ros-kinetic-turtlebot \
+	ros-kinetic-turtlebot-simulator \
+	ros-kinetic-turtlebot-apps
 RUN cd ~/catkin_ws/src && \
     git clone https://github.com/RIVeR-Lab/apriltags_ros.git
 RUN cd ~/catkin_ws && \

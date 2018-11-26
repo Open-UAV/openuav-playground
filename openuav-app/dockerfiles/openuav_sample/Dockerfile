@@ -39,9 +39,9 @@ RUN ros-setups/ubuntu-16/setup-gym-gzweb-uavnav.sh
 #RUN git clone https://github.com/schmittlema/ros-setups.git && cd ros-setups/ubuntu-16 && ./setup-ros.sh && ./setup-mavlink-mavros.sh && ./setup-install.sh && ./setup-gym-gzweb-uavnav.sh
 
 #Turtlebot modules hack 
-RUN mkdir /lib/modules
-COPY lib/. /lib/modules
-RUN ls /lib/modules
+#RUN mkdir /lib/modules
+#COPY lib/. /lib/modules
+#RUN ls /lib/modules
 
 RUN pip --no-cache-dir install \
          --upgrade pip \
@@ -126,9 +126,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ros-kinetic-image-transport-plugins \
         ros-kinetic-image-proc 
 RUN apt-get install -y ros-kinetic-rosbridge* ros-kinetic-opencv-apps ros-kinetic-tf2-geometry-msgs
-RUN apt-get update && apt-get install -y ros-kinetic-turtlebot \
-	ros-kinetic-turtlebot-simulator \
-	ros-kinetic-turtlebot-apps
+#RUN apt-get update && apt-get install -y ros-kinetic-turtlebot \
+#	ros-kinetic-turtlebot-simulator \
+#	ros-kinetic-turtlebot-apps
 RUN cd ~/catkin_ws/src && \
     git clone https://github.com/RIVeR-Lab/apriltags_ros.git
 RUN cd ~/catkin_ws && \

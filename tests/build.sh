@@ -5,4 +5,4 @@ cd ../
 docker network ls
 docker images
 docker ps
-docker run -it --net=tests_openuavapp_default --name=openuavapp_x${3:-`date +%s`} -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/hanand/openuav-playground/samples/leader-follower:/simulation -e DISPLAY=:0 --entrypoint "/home/setup.sh" dreamslab/openuavapp_openuav:latest
+docker run -it --net=tests_default --name=openuavapp_x${3:-`date +%s`} -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/hanand/openuav-playground/samples/leader-follower:/simulation -e DISPLAY=:0 --entrypoint "/home/setup.sh" dreamslab/openuavapp_openuav:latest

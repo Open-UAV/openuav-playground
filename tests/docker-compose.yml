@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
   openuav:
-    build: dreamslab/openuavapp_openuav:latest
+    image: dreamslab/openuavapp_openuav:latest
     volumes:
       - ../samples/testSimulation:/simulation
       - /tmp/.X11-unix:/tmp/.X11-unix

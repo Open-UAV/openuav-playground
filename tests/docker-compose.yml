@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  db:
+    build: dockerfiles/postgres/
+  web:
+    restart: always
+    build: dockerfiles/django/
+    command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py makemigrations && python manage.py migrate && python3 manage.py runserver 0.0.0.0:80"
+    # command: bash -c "while ! pg_isready -h db ; do sleep 1 ; done && python manage.py makemigrations && python manage.py migrate && gunicorn openuav.wsgi -b 0.0.0.0:80"
+    volumes:
+      - .:/code
+    ports:
+      - "8001:80"
+    depends_on:
+      - db
+  openuav:
+    build: dockerfiles/openuav_sample/
+    volumes:
+      - ../samples/testSimulation:/simulation
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=$DISPLAY
+    expose:
+      - "8000"
+      - "31819"
+      - "80"
+      - "9090"
+    entrypoint: /home/setup.sh
+
+networks:  
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
+

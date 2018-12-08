@@ -16,6 +16,10 @@ function measure() {
             ctr = ctr + 1;
             measureMean = measureTotal / ctr;
             console.log(measureMean);
+            if (ctr == 250){
+                return 0;
+            }
+
     });
     ros.on('error', function(error) {
         console.log('Error connecting to websocket server: ', error.code);

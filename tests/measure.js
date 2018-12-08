@@ -16,10 +16,9 @@ function measure() {
             ctr = ctr + 1;
             measureMean = measureTotal / ctr;
             console.log(measureMean);
-            console.log(ctr);
             if (ctr == 250){
                 console.log("Exiting after 250 iterations");
-                process.exit(1);
+                process.exit(0);
             }
     });
     ros.on('error', function(error) {

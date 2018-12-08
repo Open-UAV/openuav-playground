@@ -1,0 +1,8 @@
+sudo: required
+dist: trusty
+before_install:
+  - ./tests/test_setup.sh
+  - ./tests/build.sh
+script:
+  - node tests/measure.js
+language: generic

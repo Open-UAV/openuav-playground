@@ -16,10 +16,11 @@ function measure() {
             ctr = ctr + 1;
             measureMean = measureTotal / ctr;
             console.log(measureMean);
+            console.log(ctr);
             if (ctr == 250){
-                return 0;
+                console.log("Exiting after 250 iterations");
+                process.exit(1);
             }
-
     });
     ros.on('error', function(error) {
         console.log('Error connecting to websocket server: ', error.code);

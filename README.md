@@ -5,6 +5,6 @@ Project website: https://openuav.us
 - cd openuav-playground/openuav-app
 - mkdir dockerfiles/openuav_sample/lib
 - cp -r /lib/modules/$(uname -r) dockerfiles/openuav_sample/lib
-- xhost +local:  # Do understand the implications of this command
+- xhost +local: # Do understand the implications of this command
 - docker-compose up
 

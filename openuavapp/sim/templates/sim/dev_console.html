@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+
+    <script type="text/javascript" src="https://openuav.us/scripts/eventemitter2.js"></script>
+    <script type="text/javascript" src="https://openuav.us/scripts/roslib.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+
+    {% load static %}
+    <script src="{% static "sim/randomColor.js" %}"></script>
+
+    <script type="text/javascript" type="text/javascript">
+        // Connecting to ROS
+        // -----------------
+        isConnected = false;
+        websocket_url_str = 'wss://{{rosDomainName}}';
+        ros = new ROSLIB.Ros({
+            url: websocket_url_str
+        });
+
+        function rosError(error) {
+            console.log('Error connecting to websocket server: ', error);
+        }
+
+        ros.on('error', rosError);
+
+        ros.on('connection', function() {
+            console.log('Connected to websocket server.');
+            isConnected = true;
+        });
+
+        ros.on('close', function() {
+            console.log('Connection to websocket server closed.');
+        });
+
+        function pageOnload() {
+
+        }
+
+        function deg2rad(angle) {
+            return (angle * Math.PI) / 180.0;
+        }
+
+        function triangleCoords(x, y, radius, angle) {
+            var angle = angle + 270;
+            return [radius * Math.cos(deg2rad(-60 + angle)) + x, radius * Math.sin(deg2rad(-60 + angle)) + y, radius * Math.cos(deg2rad(90 + angle)) + x, radius * Math.sin(deg2rad(90 + angle)) + y, radius * Math.cos(deg2rad(240 + angle)) + x, radius * Math.sin(deg2rad(240 + angle)) + y];
+        }
+
+        // Subscribing to a Topic
+        // ----------------------
+        listener = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        measureTotal = 0
+        ctr = 0;
+        for (i = 1; i <= {{num_uavs}}; i++) {
+            listener[i - 1] = new ROSLIB.Topic({
+                ros: ros,
+                name: '/mavros' + i + '/local_position/odom',
+                messageType: 'nav_msgs/Odometry'
+            });
+        }
+
+        listenerMeasure = new ROSLIB.Topic({
+            ros: ros,
+            name: '/measure',
+            messageType: 'std_msgs/Float64'
+        });
+
+        listenerMeasure.subscribe(function(message) {
+            measureTotal = measureTotal + parseFloat(message.data)
+            ctr = ctr + 1;
+            measureMean = measureTotal / ctr;
+            document.getElementById("measure").innerHTML = "measure:&nbsp" + parseFloat(message.data).toFixed(2) + ",&nbspavg measure:&nbsp" + parseFloat(measureMean).toFixed(2);;
+        });
+
+        X_OFFSET = 70
+        ALT_SCL = 0.3
+        Y_OFFSET = 40
+        SCALE = 3
+        OFF = 0.5 
+        {% for _ in range %}
+            listener[{{forloop.counter|add:"-1"}}].subscribe(function(message) {
+                msg = message;
+                quat = new THREE.Quaternion(
+                    msg.pose.pose.orientation.x,
+                    msg.pose.pose.orientation.y,
+                    msg.pose.pose.orientation.z,
+                    msg.pose.pose.orientation.w
+                );
+                euler = new THREE.Euler();
+                euler.setFromQuaternion(quat);
+
+                document.getElementById("/traingle-{{forloop.counter}}").setAttribute("points", triangleCoords((X_OFFSET + message.pose.pose.position.x) * SCALE, (Y_OFFSET + -1 * message.pose.pose.position.y) * SCALE, 20, -THREE.Math.radToDeg(euler.z)));
+                document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cx", (X_OFFSET + message.pose.pose.position.x) * SCALE);
+                document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("cy", (-1 * message.pose.pose.position.y + Y_OFFSET) * SCALE);
+                document.getElementById("/mavros{{forloop.counter}}/local_position/pose").setAttribute("r", (OFF + message.pose.pose.position.z) * ALT_SCL);
+                document.getElementById("debug{{forloop.counter}}").innerHTML = "uav{{forloop.counter}} pose:&nbsp" + parseFloat(message.pose.pose.position.x).toFixed(2) + ",&nbsp" + parseFloat(message.pose.pose.position.y).toFixed(2) + ",&nbsp" + parseFloat(message.pose.pose.position.z).toFixed(2) + "&nbsp lin vel:&nbsp" + parseFloat(message.twist.twist.linear.x).toFixed(2) + ",&nbsp" + parseFloat(message.twist.twist.linear.y).toFixed(2) + ",&nbsp" + parseFloat(message.twist.twist.linear.z).toFixed(2);
+            });
+        {% endfor %}
+    </script>
+    <title>UAV Simulation</title>
+</head>
+
+<body id="page-body" style="background-color:#FFFFFF;">
+
+
+    <!-- Navigation bar -->
+    <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
+    <nav class="navbar navbar-light" style="background-color: #000000;">
+        <div class="container-fluid">
+            <table style="width: 100%">
+                <tr>
+                    <td class="block">
+                        <a class="navbar-brand" href="#" style="color:#808080;" >OpenUAV Web Console</a>
+                    </td>
+                    <td align="right" style="float:right">
+                        <ul class="nav nav-pills" style="text-align: right;">
+                            <li class="nav-item active"><a class="nav-link" id="clickForHome" data-toggle="pill" href="#home">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#menu1">Terminal</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </nav>
+    <!-- Navigation bar -->
+
+    <!-- Main Content -->
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <div class="container-fluid table-responsive">
+                <table class="table">
+                    <tr style="width:100%;height: auto;">
+                        <td style="width:40%;height: auto;">
+                            <div class="container-fluid">
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:300px;">
+                                    {% for _ in range %}
+                                    <polygon id="/traingle-{{forloop.counter}}" points="25,6 10,40 40,40" style="fill:lime;stroke:purple;stroke-width:1" />
+                                    <circle id="/mavros{{forloop.counter}}/local_position/pose" cx="250" cy="250" r="3" stroke="black" stroke-width="1" fill="grey" />  
+
+                                    <script>
+                                        document.getElementById("/traingle-{{forloop.counter}}").style.fill = randomColor();
+                                    </script>
+                                    {% endfor %}
+                                </svg>
+
+                                <div id="measure">nan</div>
+                                <br/> 
+                                {% for _ in range %}
+                                <div id="debug{{forloop.counter}}">nan</div>
+                                <br/> 
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td style="width:60%;height: auto;">
+                            <div class="container-fluid table-responsive">
+                                <table class="table">
+                                    <div class="container-fluid">
+                                        <tr style="width:100%;height: auto;">
+                                            <div class="container-fluid">
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_2_camera/image_raw_front/ground_truth_tracking" height="600" width="800" frameborder="0"></iframe>
+                                                </td>
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-object-detections" src="https://{{viewDomainName}}/stream_viewer?topic=/general_contours/image" height="600" width="800" frameborder="0"></iframe>
+                                                </td>
+                                            </div>
+                                        </tr>
+                                        {% for _ in range %}
+                                        <tr style="width:100%;height: auto;">
+                                            <div class="container-fluid">
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-1{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_front&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
+                                                </td>
+                                                <td style="width:50%;height: auto;">
+                                                    <iframe id="video-2{{forloop.counter}}" src="https://{{viewDomainName}}/stream_viewer?topic=/uav_{{forloop.counter}}_camera/image_raw_down&bitrate=100000&quality=50" width="768px" height="480px" frameborder="0"></iframe>
+                                                </td>
+                                            </div>
+                                        </tr>
+                                        {% endfor %}
+                                    </div>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="menu1" class="tab-pane fade">
+            <iframe id="ifm" src="https://{{terminalDomainName}}" style="position:relative; left: 0; right: 0; bottom: 0; top: 0px;" width="100%" height="100%" frameborder="0"></iframe>
+        </div>
+    </div>
+    <!-- Main Content -->
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+    <script>
+        $( document ).ready(function() {
+            $('#clickForHome').click();
+        });
+    </script>
+
+    <!-- For setting iframe height -->
+    <script type="text/javascript">
+        var buffer = 65; //scroll bar buffer
+        var iframe = document.getElementById('ifm');
+
+        function pageY(elem) {
+            return elem.offsetParent ? (elem.offsetTop + pageY(elem.offsetParent)) : elem.offsetTop;
+        }
+
+        function resizeIframe() {
+            var height = document.documentElement.clientHeight;
+            height -= pageY(document.getElementById('ifm'))+ buffer ;
+            height = (height < 0) ? 0 : height;
+            document.getElementById('ifm').style.height = height + 'px';
+            console.log(height + 'px');
+        }
+
+        // .onload doesn't work with IE8 and older.
+        if (iframe.attachEvent) {
+            iframe.attachEvent("onload", resizeIframe);
+        } else {
+            iframe.onload=resizeIframe;
+        }
+
+        window.onresize = resizeIframe;
+    </script>
+</body>
+
+</html>

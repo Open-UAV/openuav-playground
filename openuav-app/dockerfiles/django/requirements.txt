@@ -1,4 +1,0 @@
-Django
-gunicorn==19.7.1
-psycopg2
-uwsgi	

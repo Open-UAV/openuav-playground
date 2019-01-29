@@ -30,7 +30,7 @@ class TestFollow:
         rospy.Subscriber('/mavros'+ leader_uav + '/local_position/pose', PoseStamped, callback=self.leader_cb)
         rospy.Subscriber('/mavros'+ this_uav + '/local_position/pose', PoseStamped, callback=self.follower_cb)
         rospy.Subscriber('/mavros'+ this_uav + '/state', State, callback=self.state_cb)
-	rospy.Subscriber('/mavros'+ leader_uav + '/local_position/velocity_body', TwistStamped, callback=self.leaderVel_cb)
+	rospy.Subscriber('/mavros'+ leader_uav + '/local_position/velocity_local', TwistStamped, callback=self.leaderVel_cb)
 
         rate = rospy.Rate(5)  # Hz
         rate.sleep()

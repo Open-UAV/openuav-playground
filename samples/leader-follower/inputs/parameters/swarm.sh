@@ -1,8 +1,8 @@
 #!/bin/bash
 source /root/.bashrc
-num_uavs=2
+num_uavs=3
 duration_seconds=4000
-FOLLOW_D_GAIN=1
-LOOP_EDGE=40
-DIST_THRESHOLD=4
-ALTITUDE=20
+FOLLOW_D_GAIN=-15
+LOOP_EDGE=60
+DIST_THRESHOLD=15
+ALTITUDE=50

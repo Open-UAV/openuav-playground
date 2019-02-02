@@ -22,7 +22,7 @@ This will take a while.
 
 Once the build is complete, you will be able to run simulations and see it by running gzclient and rqt in the simulaiton container. 
 Example: 
-nvidia-docker run -dit --net=openuavapp_default --name=openuavapp_x${3:-`date +%s`} -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/jdas/openuav-playground/samples/formation/:/simulation -e DISPLAY=:0 --entrypoint "/home/setup.sh" openuavapp_openuav
+- nvidia-docker run -dit --net=openuavapp_default --name=openuavapp_x${3:-`date +%s`} -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/jdas/openuav-playground/samples/formation/:/simulation -e DISPLAY=:0 --entrypoint "/home/setup.sh" openuavapp_openuav
 
 Assume the assigned simulation container name is openuav_x12345678 , you can verify yours by using docker ps 
 

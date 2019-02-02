@@ -31,7 +31,7 @@ Assume the assigned simulation container name is openuav_x12345678 , you can ver
 - <container-id># source /usr/share/gazebo-7/setup.sh 
 - <container-id># gzclient
   
-Gazebo client will pop up on your host. T
+Gazebo client will pop up on your host. 
   
 
  

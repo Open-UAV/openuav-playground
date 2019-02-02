@@ -10,8 +10,8 @@ Here are the instructions for installing the simulation testbed on an Ubuntu 16.
 - git clone https://github.com/Open-UAV/openuav-playground
 - xhost +local:  
 
-Do understand the implications of sharing xserver. 
-- 
+- Do understand the implications of sharing xserver. 
+ 
 - curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
 - sudo apt-get update
 - sudo apt-get install -y nvidia-docker

@@ -8,7 +8,6 @@ Here are the instructions for installing the simulation testbed on an Ubuntu 16.
 - sudo systemctl start docker
 - sudo apt-get install docker-compose 
 - git clone https://github.com/Open-UAV/openuav-playground
-- cd openuav-playground/openuavapp
 - xhost +local:  # Do understand the implications of this command
 
 - 
